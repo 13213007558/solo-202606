@@ -3,6 +3,7 @@ import axios from 'axios';
 import PetCard from './components/PetCard';
 import ActivityLog from './components/ActivityLog';
 import HealthTrend from './components/HealthTrend';
+import { calculateHealthScore, HealthStatus } from './utils/healthScore';
 
 interface FoodDetail {
   name: string;
@@ -66,6 +67,7 @@ const ACTIVITY_ICONS: Record<ActivityType, string> = {
 
 export default function App() {
   const [pets, setPets] = useState<PetSummary[]>([]);
+  const [healthStatuses, setHealthStatuses] = useState<Record<string, HealthStatus>>({});
   const [selectedPet, setSelectedPet] = useState<PetSummary | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [trends, setTrends] = useState<TrendPoint[]>([]);
@@ -76,8 +78,23 @@ export default function App() {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; activityId: string } | null>(null);
 
   const fetchPets = useCallback(async () => {
-    const res = await axios.get('/api/pets');
-    setPets(res.data);
+    const petsRes = await axios.get<PetSummary[]>('/api/pets');
+    const petList = petsRes.data;
+    setPets(petList);
+
+    const trendPromises = petList.map((pet) =>
+      axios
+        .get<TrendPoint[]>(`/api/trends?petId=${pet.id}&days=7`)
+        .then((res) => ({ petId: pet.id, trends: res.data }))
+        .catch(() => ({ petId: pet.id, trends: [] }))
+    );
+
+    const results = await Promise.all(trendPromises);
+    const statusMap: Record<string, HealthStatus> = {};
+    results.forEach(({ petId, trends: petTrends }) => {
+      statusMap[petId] = calculateHealthScore(petTrends);
+    });
+    setHealthStatuses(statusMap);
   }, []);
 
   const fetchActivities = useCallback(async (petId: string) => {
@@ -163,6 +180,20 @@ export default function App() {
           <h1>🐾 PawTrack</h1>
           <p>宠物日常记录与健康追踪</p>
         </header>
+        <div className="legend-bar">
+          <span className="legend-item">
+            <span className="legend-dot health-healthy" />
+            健康
+          </span>
+          <span className="legend-item">
+            <span className="legend-dot health-warning" />
+            需关注
+          </span>
+          <span className="legend-item">
+            <span className="legend-dot health-alert" />
+            需警惕
+          </span>
+        </div>
         <div className="pet-grid">
           {pets.map((pet) => (
             <PetCard
@@ -170,6 +201,7 @@ export default function App() {
               pet={pet}
               timeAgo={getTimeAgo(pet.lastActivityTime)}
               emoji={AVATAR_EMOJIS[pet.breed] || '🐾'}
+              healthStatus={healthStatuses[pet.id] || 'warning'}
               onClick={handlePetClick}
             />
           ))}
