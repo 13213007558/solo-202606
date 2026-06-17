@@ -9,7 +9,7 @@ export const emojiCategories: EmojiCategory[] = [
     name: '表情',
     icon: '�',
     emojis: [
-      '�😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂',
+      '�', '😃', '😄', '😁', '😆', '😅', '🤣', '😂',
       '🙂', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘',
       '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭',
       '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏',
@@ -19,7 +19,7 @@ export const emojiCategories: EmojiCategory[] = [
     name: '神态',
     icon: '�',
     emojis: [
-      '�😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤',
+      '�', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤',
       '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵',
       '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '😎', '🤓',
       '🧐', '😕', '😟', '🙁', '☹️', '😮', '😯', '😲',
@@ -49,7 +49,7 @@ export const emojiCategories: EmojiCategory[] = [
     name: '符号',
     icon: '⭐',
     emojis: [
-      '�💕', '💞', '💓', '💗', '💖', '💘', '💝', '⭐',
+      '��', '💞', '💓', '💗', '💖', '💘', '💝', '⭐',
       '🌟', '✨', '🔥', '💯', '✅', '❌', '⚡', '🌈',
       '🎉', '🎊', '🎁', '🏆', '🥇', '🎯', '🎨', '🎵',
       '🍳', '🥘', '🍜', '🍰', '☕', '🍵', '🥂', '🍷',
@@ -58,3 +58,5 @@ export const emojiCategories: EmojiCategory[] = [
 ];
 
 export const emojiList = emojiCategories.flatMap((cat) => cat.emojis);
+
+export default emojiList;

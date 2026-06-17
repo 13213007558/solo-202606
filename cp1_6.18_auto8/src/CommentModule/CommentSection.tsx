@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import styled from '@emotion/styled';
 import { css, keyframes } from '@emotion/react';
 import { theme } from '../theme';
@@ -99,7 +100,7 @@ const panelFadeIn = keyframes`
 `;
 
 const EmojiPanelContainer = styled.div<{ x: number; y: number }>`
-  position: fixed;
+  position: absolute;
   left: ${(props) => props.x}px;
   top: ${(props) => props.y}px;
   background: ${theme.colors.card};
@@ -209,11 +210,13 @@ const CategoryTab = styled.button<{ active: boolean; index: number }>`
 const TabIndicator = styled.div<{ activeIndex: number; tabCount: number }>`
   position: absolute;
   bottom: -1px;
-  left: ${(props) => (props.activeIndex * 100) / props.tabCount}%;
+  left: 0;
   width: ${(props) => 100 / props.tabCount}%;
-  height: 2px;
+  height: 3px;
   background: ${theme.colors.primary};
-  transition: left ${theme.transitions.normal}, width ${theme.transitions.normal};
+  border-radius: 2px 2px 0 0;
+  transform: translateX(${(props) => props.activeIndex * 100}%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
 const EmojiGrid = styled.div`
@@ -469,6 +472,21 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId }) => {
   const emojiButtonRef = useRef<HTMLButtonElement>(null);
   const emojiPanelRef = useRef<HTMLDivElement>(null);
   const inputAreaRef = useRef<HTMLDivElement>(null);
+  const isMountedRef = useRef(true);
+  const dragMoveRef = useRef<((e: MouseEvent) => void) | null>(null);
+  const dragUpRef = useRef<((e: MouseEvent) => void) | null>(null);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (dragMoveRef.current) {
+        document.removeEventListener('mousemove', dragMoveRef.current);
+      }
+      if (dragUpRef.current) {
+        document.removeEventListener('mouseup', dragUpRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     loadComments(1);
@@ -528,13 +546,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId }) => {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
+      if (!isMountedRef.current || !isDragging) return;
 
-      const newX = e.clientX - dragOffset.x;
-      const newY = e.clientY - dragOffset.y;
+      const newX = e.clientX + window.scrollX - dragOffset.x;
+      const newY = e.clientY + window.scrollY - dragOffset.y;
 
-      const maxX = window.innerWidth - 320;
-      const maxY = window.innerHeight - 350;
+      const maxX = document.documentElement.scrollWidth - 320;
+      const maxY = document.documentElement.scrollHeight - 100;
 
       setPanelPosition({
         x: Math.max(0, Math.min(newX, maxX)),
@@ -543,12 +561,18 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId }) => {
     };
 
     const handleMouseUp = () => {
+      if (!isMountedRef.current) return;
       setIsDragging(false);
     };
 
     if (isDragging) {
+      dragMoveRef.current = handleMouseMove;
+      dragUpRef.current = handleMouseUp;
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+    } else {
+      dragMoveRef.current = null;
+      dragUpRef.current = null;
     }
 
     return () => {
@@ -563,18 +587,72 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId }) => {
     } else {
       const buttonRect = emojiButtonRef.current?.getBoundingClientRect();
       if (buttonRect) {
-        const initialX = buttonRect.left;
-        const initialY = buttonRect.top - 380;
+        const initialX = buttonRect.left + window.scrollX;
+        const initialY = buttonRect.top + window.scrollY - 380;
 
         setPanelPosition({
-          x: Math.max(0, Math.min(initialX, window.innerWidth - 320)),
-          y: Math.max(0, Math.min(initialY, window.innerHeight - 350)),
+          x: Math.max(0, Math.min(initialX, document.documentElement.scrollWidth - 320)),
+          y: Math.max(0, initialY),
         });
       }
       setActiveCategory(0);
       setShowEmojiPicker(true);
     }
   };
+
+  const emojiPanel = showEmojiPicker && (
+    <EmojiPanelContainer
+      ref={emojiPanelRef}
+      x={panelPosition.x}
+      y={panelPosition.y}
+      style={{
+        cursor: isDragging ? 'grabbing' : 'default',
+      }}
+    >
+      <PanelHeader onMouseDown={handleMouseDown}>
+        <PanelTitle>
+          <span>😊</span>
+          <span>选择表情</span>
+        </PanelTitle>
+        <PanelDragHandle>
+          <DragDot />
+          <DragDot />
+          <DragDot />
+        </PanelDragHandle>
+      </PanelHeader>
+
+      <CategoryTabs>
+        {emojiCategories.map((category, index) => (
+          <CategoryTab
+            key={category.name}
+            active={activeCategory === index}
+            index={index}
+            data-label={category.name}
+            onClick={() => setActiveCategory(index)}
+            type="button"
+          >
+            {category.icon}
+          </CategoryTab>
+        ))}
+        <TabIndicator
+          activeIndex={activeCategory}
+          tabCount={emojiCategories.length}
+        />
+      </CategoryTabs>
+
+      <EmojiGrid>
+        {emojiCategories[activeCategory].emojis.map((emoji, index) => (
+          <EmojiItem
+            key={`${activeCategory}-${index}`}
+            onClick={() => handleEmojiClick(emoji)}
+            type="button"
+          >
+            {emoji}
+          </EmojiItem>
+        ))}
+      </EmojiGrid>
+    </EmojiPanelContainer>
+  );
 
   const loadComments = async (pageNum: number) => {
     try {
@@ -749,59 +827,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId }) => {
         </LoadMoreButton>
       )}
 
-      {showEmojiPicker && (
-        <EmojiPanelContainer
-          ref={emojiPanelRef}
-          x={panelPosition.x}
-          y={panelPosition.y}
-          style={{
-            cursor: isDragging ? 'grabbing' : 'default',
-          }}
-        >
-          <PanelHeader onMouseDown={handleMouseDown}>
-            <PanelTitle>
-              <span>😊</span>
-              <span>选择表情</span>
-            </PanelTitle>
-            <PanelDragHandle>
-              <DragDot />
-              <DragDot />
-              <DragDot />
-            </PanelDragHandle>
-          </PanelHeader>
-
-          <CategoryTabs>
-            {emojiCategories.map((category, index) => (
-              <CategoryTab
-                key={category.name}
-                active={activeCategory === index}
-                index={index}
-                data-label={category.name}
-                onClick={() => setActiveCategory(index)}
-                type="button"
-              >
-                {category.icon}
-              </CategoryTab>
-            ))}
-            <TabIndicator
-              activeIndex={activeCategory}
-              tabCount={emojiCategories.length}
-            />
-          </CategoryTabs>
-
-          <EmojiGrid>
-            {emojiCategories[activeCategory].emojis.map((emoji, index) => (
-              <EmojiItem
-                key={`${activeCategory}-${index}`}
-                onClick={() => handleEmojiClick(emoji)}
-                type="button"
-              >
-                {emoji}
-              </EmojiItem>
-            ))}
-          </EmojiGrid>
-        </EmojiPanelContainer>
-      )}
+      {emojiPanel && createPortal(emojiPanel, document.body)}
     </SectionContainer>
   );
 };
