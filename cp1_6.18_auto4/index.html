@@ -34,15 +34,15 @@
       top: 20px;
       left: 20px;
       z-index: 100;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
       border-radius: 16px;
       padding: 20px 24px;
       color: #e8edf5;
       min-width: 220px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
     }
 
     .control-panel h2 {
@@ -125,36 +125,80 @@
     .atom-info-popup {
       position: fixed;
       z-index: 200;
-      background: rgba(255, 255, 255, 0.14);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
+      background: transparent;
+      border: none;
+      border-radius: 14px;
       padding: 14px 18px;
       color: #e8edf5;
       pointer-events: none;
       opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
-      min-width: 140px;
+      transform: scale(0.92);
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(255, 255, 255, 0.08);
+      min-width: 170px;
+      overflow: visible;
+    }
+
+    .atom-info-popup::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      z-index: -1;
     }
 
     .atom-info-popup.visible {
       opacity: 1;
-      transform: translateY(0);
+      transform: scale(1);
+    }
+
+    .atom-info-popup .popup-arrow {
+      position: absolute !important;
+      display: block !important;
+      opacity: 1 !important;
+      z-index: 201 !important;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .atom-info-popup .popup-arrow polygon {
+      fill: rgba(140, 160, 190);
+      opacity: 0.85;
+      stroke: rgba(255, 255, 255, 0.3);
+      stroke-width: 0.5;
+    }
+
+    .atom-info-popup.arrow-left .popup-arrow {
+      left: -11px !important;
+      transform: none;
+    }
+
+    .atom-info-popup.arrow-right .popup-arrow {
+      right: -11px !important;
+      transform: scaleX(-1);
     }
 
     .atom-info-popup .element-symbol {
       font-size: 22px;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
 
     .atom-info-popup .info-row {
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.7;
+      letter-spacing: 0.2px;
+    }
+
+    .atom-info-popup .info-row + .info-row {
+      margin-top: 2px;
     }
 
     .fade-transition {
@@ -188,6 +232,9 @@
   </div>
 
   <div class="atom-info-popup" id="atom-info-popup">
+    <svg class="popup-arrow" id="popup-arrow" width="12" height="20" viewBox="0 0 12 20">
+      <polygon points="12,0 0,10 12,20" />
+    </svg>
     <div class="element-symbol" id="popup-symbol"></div>
     <div class="info-row" id="popup-index"></div>
     <div class="info-row" id="popup-coords"></div>

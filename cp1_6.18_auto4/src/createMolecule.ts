@@ -35,6 +35,49 @@ export interface MoleculeObjects {
   group: THREE.Group;
   atomMeshes: THREE.Mesh[];
   labels: THREE.Sprite[];
+  bondMeshes: THREE.Mesh[];
+}
+
+type FadeCallback = () => void;
+
+function getSpecular(element: string): number {
+  switch (element) {
+    case 'O':
+      return 0x888899;
+    case 'C':
+      return 0x666677;
+    case 'N':
+      return 0x5566aa;
+    case 'S':
+      return 0xaaaa55;
+    case 'F':
+    case 'Cl':
+    case 'Br':
+    case 'I':
+      return 0x88aaaa;
+    default:
+      return 0x555555;
+  }
+}
+
+function getShininess(element: string): number {
+  switch (element) {
+    case 'O':
+      return 120;
+    case 'C':
+      return 90;
+    case 'N':
+      return 100;
+    case 'S':
+      return 80;
+    case 'F':
+    case 'Cl':
+    case 'Br':
+    case 'I':
+      return 110;
+    default:
+      return 80;
+  }
 }
 
 function getColor(element: string): number {
@@ -51,8 +94,10 @@ function createAtomMesh(atom: AtomData): THREE.Mesh {
   const color = getColor(atom.element);
   const material = new THREE.MeshPhongMaterial({
     color,
-    shininess: 60,
-    specular: 0x444444,
+    shininess: getShininess(atom.element),
+    specular: getSpecular(atom.element),
+    transparent: true,
+    opacity: 1,
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(atom.x, atom.y, atom.z);
@@ -66,8 +111,10 @@ function createBondMesh(from: THREE.Vector3, to: THREE.Vector3): THREE.Mesh {
   const geometry = new THREE.CylinderGeometry(BOND_RADIUS, BOND_RADIUS, length, 12, 1);
   const material = new THREE.MeshPhongMaterial({
     color: 0x667799,
-    shininess: 30,
-    specular: 0x222222,
+    shininess: 60,
+    specular: 0x444455,
+    transparent: true,
+    opacity: 1,
   });
   const mesh = new THREE.Mesh(geometry, material);
 
@@ -116,6 +163,7 @@ export function createMolecule(data: MoleculeData): MoleculeObjects {
   const group = new THREE.Group();
   const atomMeshes: THREE.Mesh[] = [];
   const labels: THREE.Sprite[] = [];
+  const bondMeshes: THREE.Mesh[] = [];
 
   const positions: Map<number, THREE.Vector3> = new Map();
 
@@ -136,14 +184,68 @@ export function createMolecule(data: MoleculeData): MoleculeObjects {
     if (fromPos && toPos) {
       const bondMesh = createBondMesh(fromPos, toPos);
       group.add(bondMesh);
+      bondMeshes.push(bondMesh);
     }
   }
 
-  return { group, atomMeshes, labels };
+  return { group, atomMeshes, labels, bondMeshes };
 }
 
 export function centerMolecule(objects: MoleculeObjects): void {
   const box = new THREE.Box3().setFromObject(objects.group);
   const center = box.getCenter(new THREE.Vector3());
   objects.group.position.sub(center);
+}
+
+export function setMoleculeOpacity(objects: MoleculeObjects, opacity: number): void {
+  for (const mesh of objects.atomMeshes) {
+    (mesh.material as THREE.MeshPhongMaterial).opacity = opacity;
+  }
+  for (const mesh of objects.bondMeshes) {
+    (mesh.material as THREE.MeshPhongMaterial).opacity = opacity;
+  }
+  for (const label of objects.labels) {
+    (label.material as THREE.SpriteMaterial).opacity = opacity;
+  }
+}
+
+export function fadeOutMolecule(objects: MoleculeObjects, durationMs: number = 500): Promise<void> {
+  return new Promise((resolve) => {
+    const startTime = performance.now();
+    const step = () => {
+      const elapsed = performance.now() - startTime;
+      const t = Math.min(elapsed / durationMs, 1);
+      const opacity = 1 - easeInOutCubic(t);
+      setMoleculeOpacity(objects, opacity);
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        resolve();
+      }
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+export function fadeInMolecule(objects: MoleculeObjects, durationMs: number = 500): Promise<void> {
+  return new Promise((resolve) => {
+    setMoleculeOpacity(objects, 0);
+    const startTime = performance.now();
+    const step = () => {
+      const elapsed = performance.now() - startTime;
+      const t = Math.min(elapsed / durationMs, 1);
+      const opacity = easeInOutCubic(t);
+      setMoleculeOpacity(objects, opacity);
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        resolve();
+      }
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }

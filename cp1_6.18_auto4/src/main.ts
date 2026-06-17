@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { loadMolecule } from './loadData';
-import { createMolecule, centerMolecule, type MoleculeObjects } from './createMolecule';
+import { createMolecule, centerMolecule, fadeInMolecule, fadeOutMolecule, setMoleculeOpacity, type MoleculeObjects } from './createMolecule';
 import { UIController } from './ui';
 
 const container = document.getElementById('canvas-container')!;
@@ -59,6 +59,7 @@ function setMolecule(id: string): void {
 
   const newMolecule = createMolecule(data);
   centerMolecule(newMolecule);
+  setMoleculeOpacity(newMolecule, 0);
 
   newMolecule.labels.forEach((label) => {
     label.visible = ui.isLabelVisible();
@@ -66,47 +67,20 @@ function setMolecule(id: string): void {
 
   if (currentMolecule) {
     isTransitioning = true;
-    const oldGroup = currentMolecule.group;
-    oldGroup.userData.fadeProgress = 0;
-    oldGroup.userData.fadingOut = true;
-
-    newMolecule.group.userData.fadeProgress = 0;
-    newMolecule.group.userData.fadingIn = true;
-    newMolecule.group.scale.set(0.01, 0.01, 0.01);
-
-    const fadeOld = () => {
-      if (!oldGroup.userData.fadingOut) return;
-      oldGroup.userData.fadeProgress += 0.06;
-      if (oldGroup.userData.fadeProgress >= 1) {
-        scene.remove(oldGroup);
-        oldGroup.userData.fadingOut = false;
-        isTransitioning = false;
-      } else {
-        const s = 1 - oldGroup.userData.fadeProgress;
-        oldGroup.scale.set(s, s, s);
-        requestAnimationFrame(fadeOld);
-      }
-    };
-
-    const fadeNew = () => {
-      if (!newMolecule.group.userData.fadingIn) return;
-      newMolecule.group.userData.fadeProgress += 0.05;
-      if (newMolecule.group.userData.fadeProgress >= 1) {
-        newMolecule.group.scale.set(1, 1, 1);
-        newMolecule.group.userData.fadingIn = false;
-      } else {
-        const s = newMolecule.group.userData.fadeProgress;
-        const eased = 1 - Math.pow(1 - s, 3);
-        newMolecule.group.scale.set(eased, eased, eased);
-        requestAnimationFrame(fadeNew);
-      }
-    };
+    const oldMolecule = currentMolecule;
 
     scene.add(newMolecule.group);
-    fadeOld();
-    fadeNew();
+
+    fadeOutMolecule(oldMolecule, 250).then(() => {
+      scene.remove(oldMolecule.group);
+    });
+
+    fadeInMolecule(newMolecule, 500).then(() => {
+      isTransitioning = false;
+    });
   } else {
     scene.add(newMolecule.group);
+    setMoleculeOpacity(newMolecule, 1);
   }
 
   currentMolecule = newMolecule;
