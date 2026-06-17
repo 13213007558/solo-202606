@@ -55,7 +55,7 @@ export default function HealthTrend({ trends, days, onDaysChange }: HealthTrendP
       <div className="chart-section">
         <h4>⚖️ 体重 & 🏃 运动时长</h4>
         <ResponsiveContainer width="100%" height={280}>
-          <ComposedChart data={formattedTrends} animationDuration={1000}>
+          <ComposedChart data={formattedTrends}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
             <XAxis
               dataKey="dateLabel"
@@ -110,7 +110,7 @@ export default function HealthTrend({ trends, days, onDaysChange }: HealthTrendP
       <div className="chart-section">
         <h4>🍖 每日饮食次数</h4>
         <ResponsiveContainer width="100%" height={200}>
-          <ComposedChart data={formattedTrends} animationDuration={1000}>
+          <ComposedChart data={formattedTrends}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
             <XAxis
               dataKey="dateLabel"

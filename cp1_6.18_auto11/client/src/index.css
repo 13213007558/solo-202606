@@ -149,19 +149,30 @@ body {
   box-shadow: 0 0 0 2px var(--white), 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.health-healthy {
+.health-excellent {
   background: #4CAF50;
+  animation: healthPulse 3.5s ease-in-out infinite;
+}
+
+.health-good {
+  background: #2196F3;
   animation: healthPulse 3s ease-in-out infinite;
 }
 
-.health-warning {
+.health-fair {
   background: #FFC107;
   animation: healthPulse 2.5s ease-in-out infinite;
 }
 
-.health-alert {
+.health-poor {
   background: #F44336;
   animation: healthPulse 1.5s ease-in-out infinite;
+}
+
+.health-unknown {
+  background: #9E9E9E;
+  animation: none;
+  opacity: 0.7;
 }
 
 @keyframes healthPulse {

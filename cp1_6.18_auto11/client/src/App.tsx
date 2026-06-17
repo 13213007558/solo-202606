@@ -85,14 +85,26 @@ export default function App() {
     const trendPromises = petList.map((pet) =>
       axios
         .get<TrendPoint[]>(`/api/trends?petId=${pet.id}&days=7`)
-        .then((res) => ({ petId: pet.id, trends: res.data }))
-        .catch(() => ({ petId: pet.id, trends: [] }))
+        .then((res) => ({
+          petId: pet.id,
+          trends: res.data,
+          error: false,
+        }))
+        .catch(() => ({
+          petId: pet.id,
+          trends: [] as TrendPoint[],
+          error: true,
+        }))
     );
 
     const results = await Promise.all(trendPromises);
     const statusMap: Record<string, HealthStatus> = {};
-    results.forEach(({ petId, trends: petTrends }) => {
-      statusMap[petId] = calculateHealthScore(petTrends);
+    results.forEach(({ petId, trends: petTrends, error }) => {
+      if (error) {
+        statusMap[petId] = 'unknown';
+      } else {
+        statusMap[petId] = calculateHealthScore(petTrends);
+      }
     });
     setHealthStatuses(statusMap);
   }, []);
@@ -182,16 +194,24 @@ export default function App() {
         </header>
         <div className="legend-bar">
           <span className="legend-item">
-            <span className="legend-dot health-healthy" />
-            健康
+            <span className="legend-dot health-excellent" />
+            优秀
           </span>
           <span className="legend-item">
-            <span className="legend-dot health-warning" />
+            <span className="legend-dot health-good" />
+            良好
+          </span>
+          <span className="legend-item">
+            <span className="legend-dot health-fair" />
+            一般
+          </span>
+          <span className="legend-item">
+            <span className="legend-dot health-poor" />
             需关注
           </span>
           <span className="legend-item">
-            <span className="legend-dot health-alert" />
-            需警惕
+            <span className="legend-dot health-unknown" />
+            未知
           </span>
         </div>
         <div className="pet-grid">
@@ -201,7 +221,7 @@ export default function App() {
               pet={pet}
               timeAgo={getTimeAgo(pet.lastActivityTime)}
               emoji={AVATAR_EMOJIS[pet.breed] || '🐾'}
-              healthStatus={healthStatuses[pet.id] || 'warning'}
+              healthStatus={healthStatuses[pet.id] || 'unknown'}
               onClick={handlePetClick}
             />
           ))}
