@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>云境艺术展厅 · Virtual Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #1a1510; font-family: 'Noto Sans SC', sans-serif; }
+      #app { position: fixed; inset: 0; }
+      #canvas-container { position: absolute; inset: 0; }
+      #canvas-container canvas { display: block; width: 100%; height: 100%; }
+
+      #loading-screen {
+        position: absolute; inset: 0; z-index: 100;
+        background: linear-gradient(135deg, #2a1f15 0%, #1a1510 100%);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        transition: opacity 0.8s ease;
+      }
+      #loading-screen.hidden { opacity: 0; pointer-events: none; }
+      .loading-title {
+        font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 600;
+        color: #e8c98d; letter-spacing: 0.12em; margin-bottom: 2rem;
+        text-shadow: 0 0 30px rgba(232, 201, 141, 0.3);
+      }
+      .loading-bar { width: 220px; height: 2px; background: rgba(232, 201, 141, 0.15); border-radius: 2px; overflow: hidden; }
+      .loading-progress { height: 100%; width: 0%; background: linear-gradient(90deg, #c9a25d, #e8c98d); transition: width 0.3s ease; }
+
+      #ui-layer { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+      #ui-layer > * { pointer-events: auto; }
+
+      #info-panel {
+        position: absolute; top: 24px; left: 24px;
+        padding: 22px 28px;
+        min-width: 260px;
+        backdrop-filter: blur(18px) saturate(1.4);
+        -webkit-backdrop-filter: blur(18px) saturate(1.4);
+        background: linear-gradient(135deg, rgba(245, 240, 232, 0.12) 0%, rgba(232, 201, 141, 0.08) 100%);
+        border-radius: 18px;
+        border: 1px solid rgba(245, 240, 232, 0.22);
+        color: #f5f0e8;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        position: relative;
+        overflow: hidden;
+      }
+      #info-panel::before {
+        content: ''; position: absolute; inset: -2px; border-radius: 18px; padding: 2px;
+        background: linear-gradient(135deg, var(--breath-color, #c9a25d), rgba(245, 240, 232, 0.3));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor; mask-composite: exclude;
+        opacity: 0.6; pointer-events: none;
+      }
+      #info-panel::after {
+        content: ''; position: absolute; inset: -50%;
+        background: radial-gradient(circle at 50% 50%, var(--breath-glow, rgba(232, 201, 141, 0.15)), transparent 60%);
+        pointer-events: none; z-index: -1;
+      }
+      .panel-title {
+        font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 600;
+        color: #fff; letter-spacing: 0.06em; margin-bottom: 4px;
+      }
+      .panel-subtitle { font-size: 0.78rem; color: #c9b99a; letter-spacing: 0.08em; margin-bottom: 16px; opacity: 0.85; }
+      .panel-stats { display: flex; gap: 24px; }
+      .stat-item { display: flex; flex-direction: column; }
+      .stat-value { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: #e8c98d; line-height: 1; }
+      .stat-label { font-size: 0.72rem; color: #a89878; margin-top: 6px; letter-spacing: 0.1em; }
+
+      #exhibit-card {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0;
+        transition: opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1);
+        pointer-events: none;
+        z-index: 20;
+      }
+      #exhibit-card.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+      .card-inner {
+        display: flex; gap: 0;
+        max-width: 860px;
+        max-height: 78vh;
+        backdrop-filter: blur(24px) saturate(1.5);
+        -webkit-backdrop-filter: blur(24px) saturate(1.5);
+        background: linear-gradient(145deg, rgba(245, 240, 232, 0.10) 0%, rgba(201, 162, 93, 0.06) 100%);
+        border-radius: 20px;
+        border: 1px solid rgba(245, 240, 232, 0.25);
+        box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+        overflow: hidden;
+      }
+      .card-image-wrap {
+        flex: 0 0 55%;
+        background: #0d0a07;
+        display: flex; align-items: center; justify-content: center;
+        padding: 28px;
+        position: relative;
+      }
+      .card-image-wrap::after {
+        content: ''; position: absolute; inset: 0;
+        box-shadow: inset 0 0 80px rgba(0,0,0,0.6); pointer-events: none;
+      }
+      .card-image { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px; box-shadow: 0 8px 28px rgba(0,0,0,0.5); }
+      .card-info { flex: 1; padding: 32px 30px; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+      .card-tag { display: inline-block; padding: 4px 12px; background: rgba(232, 201, 141, 0.15); border: 1px solid rgba(232, 201, 141, 0.3); color: #e8c98d; border-radius: 100px; font-size: 0.7rem; letter-spacing: 0.15em; margin-bottom: 18px; align-self: flex-start; }
+      .card-title { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 10px; }
+      .card-artist { font-size: 0.95rem; color: #e8c98d; font-weight: 500; margin-bottom: 16px; letter-spacing: 0.03em; }
+      .card-dimensions { font-size: 0.82rem; color: #a89878; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(245, 240, 232, 0.1); }
+      .card-desc { font-size: 0.88rem; line-height: 1.75; color: #d4c8b0; flex: 1; overflow-y: auto; max-height: 200px; padding-right: 8px; }
+      .card-desc::-webkit-scrollbar { width: 3px; }
+      .card-desc::-webkit-scrollbar-thumb { background: rgba(232, 201, 141, 0.3); border-radius: 3px; }
+      .card-close {
+        position: absolute; top: 16px; right: 16px;
+        width: 36px; height: 36px; border-radius: 50%;
+        background: rgba(245, 240, 232, 0.1); border: 1px solid rgba(245, 240, 232, 0.2);
+        color: #f5f0e8; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.25s ease; font-size: 1.1rem;
+        backdrop-filter: blur(10px);
+      }
+      .card-close:hover { background: rgba(232, 201, 141, 0.2); border-color: rgba(232, 201, 141, 0.4); transform: rotate(90deg); }
+
+      #controls-hint {
+        position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+        display: flex; gap: 10px; align-items: center;
+        padding: 10px 18px;
+        backdrop-filter: blur(12px);
+        background: rgba(26, 21, 16, 0.55);
+        border-radius: 100px;
+        border: 1px solid rgba(245, 240, 232, 0.12);
+        color: #a89878; font-size: 0.78rem;
+      }
+      .key { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 8px; background: rgba(245, 240, 232, 0.08); border: 1px solid rgba(245, 240, 232, 0.18); border-radius: 6px; color: #f5f0e8; font-weight: 500; font-size: 0.75rem; }
+
+      #joystick {
+        position: absolute; bottom: 36px; left: 36px;
+        width: 130px; height: 130px;
+        display: none;
+        touch-action: none;
+        z-index: 15;
+      }
+      @media (max-width: 768px) {
+        #joystick { display: block; }
+        #controls-hint { display: none; }
+        #info-panel { top: 16px; left: 16px; right: 16px; min-width: auto; padding: 16px 20px; }
+        .card-inner { flex-direction: column; max-width: 92vw; }
+        .card-image-wrap { flex: 0 0 auto; max-height: 40vh; }
+      }
+      .joystick-base {
+        width: 100%; height: 100%;
+        border-radius: 50%;
+        backdrop-filter: blur(14px);
+        background: radial-gradient(circle, rgba(245, 240, 232, 0.12) 0%, rgba(26, 21, 16, 0.6) 100%);
+        border: 1px solid rgba(245, 240, 232, 0.18);
+        position: relative;
+      }
+      .joystick-stick {
+        position: absolute; top: 50%; left: 50%;
+        width: 54px; height: 54px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, rgba(232, 201, 141, 0.5), rgba(201, 162, 93, 0.3));
+        border: 1px solid rgba(232, 201, 141, 0.4);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        transition: transform 0.08s ease;
+      }
+
+      #crosshair {
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: rgba(232, 201, 141, 0.5);
+        box-shadow: 0 0 12px rgba(232, 201, 141, 0.35);
+        pointer-events: none;
+        z-index: 5;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="canvas-container"></div>
+
+      <div id="loading-screen">
+        <div class="loading-title">云境 · 艺术展厅</div>
+        <div class="loading-bar"><div class="loading-progress" id="loading-progress"></div></div>
+      </div>
+
+      <div id="ui-layer">
+        <div id="info-panel">
+          <div class="panel-title">云境艺术展厅</div>
+          <div class="panel-subtitle">VIRTUAL ART GALLERY</div>
+          <div class="panel-stats">
+            <div class="stat-item">
+              <span class="stat-value" id="stat-visitors">—</span>
+              <span class="stat-label">在线访客</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-exhibits">—</span>
+              <span class="stat-label">展品总数</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="exhibit-card">
+          <button class="card-close" id="card-close">✕</button>
+          <div class="card-inner">
+            <div class="card-image-wrap">
+              <img class="card-image" id="card-image" alt="展品图片" />
+            </div>
+            <div class="card-info">
+              <span class="card-tag" id="card-tag">ARTWORK</span>
+              <h2 class="card-title" id="card-title">作品名称</h2>
+              <div class="card-artist" id="card-artist">— 艺术家</div>
+              <div class="card-dimensions" id="card-dimensions">尺寸</div>
+              <p class="card-desc" id="card-desc">作品简介</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="controls-hint">
+          <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span>
+          <span style="margin: 0 6px; opacity: 0.5;">移动</span>
+          <span style="margin: 0 10px; opacity: 0.3;">·</span>
+          <span>鼠标拖拽 旋转视角</span>
+          <span style="margin: 0 10px; opacity: 0.3;">·</span>
+          <span>点击画作 查看详情</span>
+        </div>
+
+        <div id="joystick">
+          <div class="joystick-base">
+            <div class="joystick-stick" id="joystick-stick"></div>
+          </div>
+        </div>
+
+        <div id="crosshair"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
