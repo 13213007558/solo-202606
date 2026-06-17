@@ -130,13 +130,17 @@ function renderCreatePage(app: HTMLElement): void {
               <div class="recorder-section">
                 <div class="recorder-header">
                   <span class="recorder-title">🎙️ 录制你的声音</span>
-                  <span class="recording-time" id="recording-time">00:00</span>
+                  <span class="recording-time" id="recording-time">00:00 / 00:30</span>
                 </div>
-                <div class="waveform-container">
+                <div class="recording-hint" id="recording-hint">
+                  <span>点击下方圆形按钮开始录音</span>
+                  <span class="limit-warn" id="limit-hint" style="display:none;">⚠️ 即将达到30秒上限</span>
+                </div>
+                <div class="waveform-container" style="margin-top: 0.8rem;">
                   <canvas id="waveform-canvas"></canvas>
                 </div>
                 <div class="recorder-controls">
-                  <button type="button" class="record-btn" id="record-btn" title="点击录音">
+                  <button type="button" class="record-btn" id="record-btn" title="点击开始录音 / 再次点击停止">
                     <span class="record-btn-icon"></span>
                   </button>
                 </div>
@@ -185,18 +189,36 @@ function wireCreatePage(): void {
   const unlockTimeInput = document.getElementById('unlock-time') as HTMLInputElement;
   const recordBtn = document.getElementById('record-btn') as HTMLButtonElement;
   const recordingTimeEl = document.getElementById('recording-time') as HTMLSpanElement;
+  const recordingHintEl = document.getElementById('recording-hint') as HTMLDivElement;
+  const limitHintEl = document.getElementById('limit-hint') as HTMLSpanElement;
   const waveformCanvas = document.getElementById('waveform-canvas') as HTMLCanvasElement;
   const audioPreview = document.getElementById('audio-preview') as HTMLDivElement;
   const audioPlayer = document.getElementById('audio-player') as HTMLAudioElement;
   const clearAudioBtn = document.getElementById('clear-audio-btn') as HTMLButtonElement;
   const form = document.getElementById('capsule-form') as HTMLFormElement;
+  const hintTextEl = recordingHintEl.querySelector('span:first-child') as HTMLSpanElement;
 
   let currentImageBase64: string | undefined;
   let currentAudio: RecordingResult | null = null;
 
+  const WARNING_THRESHOLD_MS = 25000;
+  const MAX_DURATION_MS = 30000;
+
   const recorder = new AudioRecorder();
   recorder.setOnTimeUpdate((ms) => {
-    recordingTimeEl.textContent = formatDuration(ms);
+    recordingTimeEl.textContent = `${formatDuration(ms)} / ${formatDuration(MAX_DURATION_MS)}`;
+
+    if (ms >= WARNING_THRESHOLD_MS) {
+      recordingTimeEl.classList.add('warning');
+      if (limitHintEl.style.display !== 'inline') {
+        limitHintEl.style.display = 'inline';
+      }
+    } else {
+      recordingTimeEl.classList.remove('warning');
+      if (limitHintEl.style.display !== 'none') {
+        limitHintEl.style.display = 'none';
+      }
+    }
   });
   recorder.startWaveformDrawing(waveformCanvas);
 
@@ -250,12 +272,18 @@ function wireCreatePage(): void {
         await recorder.startRecording();
         isRecording = true;
         recordBtn.classList.add('recording');
+        hintTextEl.textContent = '🔴 正在录音...再次点击按钮结束';
+        recordBtn.title = '点击停止录音';
       } catch (e) {
         showToast(e instanceof Error ? e.message : '录音启动失败');
       }
     } else {
       isRecording = false;
       recordBtn.classList.remove('recording');
+      hintTextEl.textContent = '点击下方圆形按钮开始录音';
+      recordBtn.title = '点击开始录音';
+      recordingTimeEl.classList.remove('warning');
+      limitHintEl.style.display = 'none';
       try {
         const result = await recorder.stopRecording();
         if (result && result.duration >= 500) {
@@ -270,7 +298,7 @@ function wireCreatePage(): void {
       }
       recorder.cleanup();
       recorder.startWaveformDrawing(waveformCanvas);
-      recordingTimeEl.textContent = '00:00';
+      recordingTimeEl.textContent = `00:00 / ${formatDuration(MAX_DURATION_MS)}`;
     }
   });
 

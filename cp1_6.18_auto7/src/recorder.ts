@@ -117,6 +117,8 @@ export class AudioRecorder {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    let prevValues: number[] = [];
+
     const draw = () => {
       this.resizeCanvas(canvas);
 
@@ -137,19 +139,28 @@ export class AudioRecorder {
       const barCount = Math.floor(width / 4);
       const step = Math.floor(data.length / barCount);
       const gradient = ctx.createLinearGradient(0, height, 0, 0);
-      gradient.addColorStop(0, '#8B3A3A');
-      gradient.addColorStop(0.5, '#A67B5B');
-      gradient.addColorStop(1, '#B85450');
+      gradient.addColorStop(0, '#6B4226');
+      gradient.addColorStop(0.5, '#8B5A3C');
+      gradient.addColorStop(1, '#8B3A3A');
+
+      if (prevValues.length !== barCount) {
+        prevValues = new Array(barCount).fill(0);
+      }
 
       for (let i = 0; i < barCount; i++) {
-        const value = data[i * step] || 0;
-        const barHeight = Math.max(2, (value / 255) * height * 0.9);
+        const rawValue = data[i * step] || 0;
+        const normalized = Math.pow(rawValue / 255, 1.4);
+        const targetHeight = Math.max(3, normalized * height * 0.95);
+        const smoothed = prevValues[i] * 0.55 + targetHeight * 0.45;
+        prevValues[i] = smoothed;
+
+        const barHeight = Math.max(2, smoothed);
         const x = i * 4;
         const y = (height - barHeight) / 2;
 
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        const radius = 2;
+        const radius = Math.min(2, barHeight / 2);
         ctx.roundRect(x, y, 2, barHeight, radius);
         ctx.fill();
       }
@@ -174,11 +185,16 @@ export class AudioRecorder {
   private drawIdleWaveform(ctx: CanvasRenderingContext2D, width: number, height: number): void {
     const barCount = Math.floor(width / 4);
     const gradient = ctx.createLinearGradient(0, height, 0, 0);
-    gradient.addColorStop(0, 'rgba(139,58,58,0.3)');
-    gradient.addColorStop(1, 'rgba(166,123,91,0.3)');
+    gradient.addColorStop(0, 'rgba(107, 66, 38, 0.28)');
+    gradient.addColorStop(0.5, 'rgba(139, 90, 60, 0.25)');
+    gradient.addColorStop(1, 'rgba(139, 58, 58, 0.3)');
 
+    const t = Date.now() * 0.0025;
     for (let i = 0; i < barCount; i++) {
-      const barHeight = Math.max(2, Math.sin(i * 0.2 + Date.now() * 0.002) * 4 + 6);
+      const phase = i * 0.18;
+      const wave1 = Math.sin(phase + t) * 3;
+      const wave2 = Math.sin(phase * 1.5 + t * 1.3) * 2;
+      const barHeight = Math.max(2, wave1 + wave2 + 6);
       const x = i * 4;
       const y = (height - barHeight) / 2;
       ctx.fillStyle = gradient;
@@ -276,6 +292,7 @@ export function startSpectrumVisualization(
   let stopped = false;
 
   const dpr = window.devicePixelRatio || 1;
+  let prevValues: number[] = [];
 
   const draw = () => {
     if (stopped) return;
@@ -303,18 +320,28 @@ export function startSpectrumVisualization(
     const barCount = Math.floor(width / 4);
     const step = Math.floor(dataArray.length / barCount);
     const gradient = ctx.createLinearGradient(0, height, 0, 0);
-    gradient.addColorStop(0, '#8B3A3A');
-    gradient.addColorStop(0.5, '#A67B5B');
-    gradient.addColorStop(1, '#B85450');
+    gradient.addColorStop(0, '#6B4226');
+    gradient.addColorStop(0.5, '#8B5A3C');
+    gradient.addColorStop(1, '#8B3A3A');
+
+    if (prevValues.length !== barCount) {
+      prevValues = new Array(barCount).fill(0);
+    }
 
     for (let i = 0; i < barCount; i++) {
-      const value = dataArray[i * step] || 0;
-      const barHeight = Math.max(2, (value / 255) * height * 0.9);
+      const rawValue = dataArray[i * step] || 0;
+      const normalized = Math.pow(rawValue / 255, 1.4);
+      const targetHeight = Math.max(3, normalized * height * 0.95);
+      const smoothed = prevValues[i] * 0.55 + targetHeight * 0.45;
+      prevValues[i] = smoothed;
+
+      const barHeight = Math.max(2, smoothed);
       const x = i * 4;
       const y = (height - barHeight) / 2;
       ctx.fillStyle = gradient;
       ctx.beginPath();
-      ctx.roundRect(x, y, 2, barHeight, 2);
+      const radius = Math.min(2, barHeight / 2);
+      ctx.roundRect(x, y, 2, barHeight, radius);
       ctx.fill();
     }
 
