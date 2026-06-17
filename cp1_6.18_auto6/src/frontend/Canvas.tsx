@@ -56,21 +56,108 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
       const canvas = canvasRef.current;
       if (!canvas) return '';
 
+      const scaleRatio = 2;
       const exportCanvas = document.createElement('canvas');
-      exportCanvas.width = canvas.width;
-      exportCanvas.height = canvas.height;
+      exportCanvas.width = canvas.width * scaleRatio;
+      exportCanvas.height = canvas.height * scaleRatio;
       const ctx = exportCanvas.getContext('2d');
       if (!ctx) return '';
 
       ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
 
-      ctx.save();
+      ctx.scale(scaleRatio, scaleRatio);
       ctx.translate(transform.offsetX, transform.offsetY);
       ctx.scale(transform.scale, transform.scale);
 
-      elements.forEach((el) => drawElement(ctx, el, false));
-      ctx.restore();
+      elements.forEach((el) => {
+        if (el.type === 'sticky') {
+          ctx.save();
+          ctx.fillStyle = 'rgba(255, 235, 59, 0.95)';
+          ctx.fillRect(el.position.x, el.position.y, 180, 130);
+
+          ctx.strokeStyle = el.color;
+          ctx.lineWidth = 2;
+          ctx.strokeRect(el.position.x, el.position.y, 180, 130);
+
+          ctx.fillStyle = '#333333';
+          ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+          ctx.textBaseline = 'top';
+
+          const text = el.text;
+          const paddingX = 10;
+          const paddingY = 10;
+          const maxWidth = 160;
+          const lineHeight = 18;
+          const maxLines = 6;
+
+          const words = text.split('');
+          let line = '';
+          let currentY = el.position.y + paddingY;
+          let lineCount = 0;
+
+          for (let n = 0; n < words.length; n++) {
+            const testLine = line + words[n];
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && n > 0) {
+              ctx.fillText(line, el.position.x + paddingX, currentY);
+              line = words[n];
+              currentY += lineHeight;
+              lineCount++;
+              if (lineCount >= maxLines - 1) {
+                let remaining = '';
+                for (let m = n; m < words.length; m++) {
+                  const testRemaining = remaining + words[m];
+                  if (ctx.measureText(testRemaining + '...').width > maxWidth) {
+                    break;
+                  }
+                  remaining = testRemaining;
+                }
+                ctx.fillText(remaining + '...', el.position.x + paddingX, currentY);
+                ctx.restore();
+                return;
+              }
+            } else {
+              line = testLine;
+            }
+          }
+          ctx.fillText(line, el.position.x + paddingX, currentY);
+          ctx.restore();
+        } else if (el.type === 'pen') {
+          ctx.save();
+          ctx.strokeStyle = el.color;
+          ctx.lineWidth = el.lineWidth;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.beginPath();
+          if (el.points.length > 0) {
+            ctx.moveTo(el.points[0].x, el.points[0].y);
+            for (let i = 1; i < el.points.length; i++) {
+              ctx.lineTo(el.points[i].x, el.points[i].y);
+            }
+          }
+          ctx.stroke();
+          ctx.restore();
+        } else if (el.type === 'rectangle') {
+          ctx.save();
+          ctx.strokeStyle = el.color;
+          ctx.lineWidth = el.lineWidth;
+          const x = Math.min(el.startPoint.x, el.endPoint.x);
+          const y = Math.min(el.startPoint.y, el.endPoint.y);
+          const w = Math.abs(el.endPoint.x - el.startPoint.x);
+          const h = Math.abs(el.endPoint.y - el.startPoint.y);
+          ctx.strokeRect(x, y, w, h);
+          ctx.restore();
+        } else if (el.type === 'circle') {
+          ctx.save();
+          ctx.strokeStyle = el.color;
+          ctx.lineWidth = el.lineWidth;
+          ctx.beginPath();
+          ctx.arc(el.center.x, el.center.y, el.radius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+      });
 
       return exportCanvas.toDataURL('image/png');
     },
