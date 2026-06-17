@@ -4,6 +4,7 @@ import type { FormData, Season, ActivityType } from '../types'
 interface LocationFormProps {
   initialData: FormData | null
   onSubmit: (data: FormData) => void
+  onFormChange?: (data: Partial<FormData>) => void
 }
 
 const SEASON_OPTIONS: { value: Season; label: string }[] = [
@@ -21,7 +22,7 @@ const ACTIVITY_OPTIONS: { value: ActivityType; label: string; icon: string }[] =
   { value: 'cityTour', label: '城市观光', icon: '🏙️' }
 ]
 
-export const LocationForm: React.FC<LocationFormProps> = ({ initialData, onSubmit }) => {
+export const LocationForm: React.FC<LocationFormProps> = ({ initialData, onSubmit, onFormChange }) => {
   const [destination, setDestination] = useState<string>(initialData?.destination ?? '')
   const [days, setDays] = useState<number>(initialData?.days ?? 3)
   const [season, setSeason] = useState<Season>(initialData?.season ?? 'spring')
@@ -36,6 +37,12 @@ export const LocationForm: React.FC<LocationFormProps> = ({ initialData, onSubmi
       setActivities(initialData.activities)
     }
   }, [initialData])
+
+  useEffect(() => {
+    if (onFormChange) {
+      onFormChange({ destination, days, season, activities })
+    }
+  }, [destination, days, season, activities, onFormChange])
 
   const toggleActivity = (activity: ActivityType) => {
     setActivities((prev) =>

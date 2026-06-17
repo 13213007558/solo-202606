@@ -12,8 +12,16 @@ interface ToastState {
   type: 'success' | 'error' | 'info'
 }
 
+const DEFAULT_FORM_DRAFT: FormData = {
+  destination: '',
+  days: 3,
+  season: 'spring',
+  activities: []
+}
+
 const App: React.FC = () => {
   const [formData, setFormData] = useState<FormData | null>(null)
+  const [formDraft, setFormDraft] = useState<FormData>(DEFAULT_FORM_DRAFT)
   const [packingList, setPackingList] = useState<PackingListType | null>(null)
   const [toasts, setToasts] = useState<ToastState[]>([])
   const isHydrated = useRef(false)
@@ -32,9 +40,11 @@ const App: React.FC = () => {
       if (raw) {
         const parsed = JSON.parse(raw) as {
           formData: FormData | null
+          formDraft: FormData | null
           packingList: PackingListType | null
         }
         if (parsed.formData) setFormData(parsed.formData)
+        if (parsed.formDraft) setFormDraft(parsed.formDraft)
         if (parsed.packingList) setPackingList(parsed.packingList)
       }
     } catch (err) {
@@ -46,12 +56,16 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!isHydrated.current) return
     try {
-      const data = JSON.stringify({ formData, packingList })
+      const data = JSON.stringify({ formData, formDraft, packingList })
       localStorage.setItem(STORAGE_KEY, data)
     } catch (err) {
       console.warn('写入本地存储失败:', err)
     }
-  }, [formData, packingList])
+  }, [formData, formDraft, packingList])
+
+  const handleFormChange = useCallback((partial: Partial<FormData>) => {
+    setFormDraft((prev) => ({ ...prev, ...partial }))
+  }, [])
 
   const handleGenerate = useCallback(
     (data: FormData) => {
@@ -177,7 +191,11 @@ const App: React.FC = () => {
 
       <main className="app-main">
         <aside className="app-sidebar">
-          <LocationForm initialData={formData} onSubmit={handleGenerate} />
+          <LocationForm
+            initialData={formData ?? formDraft}
+            onSubmit={handleGenerate}
+            onFormChange={handleFormChange}
+          />
         </aside>
 
         <section className="app-content">
