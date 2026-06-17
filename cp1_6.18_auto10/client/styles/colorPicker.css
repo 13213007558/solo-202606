@@ -1,0 +1,204 @@
+/* ============================================
+   颜色拾取面板组件样式
+   ============================================ */
+
+.color-picker-item.panel-open {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.3), var(--shadow-lg);
+}
+
+.swatch-overlay-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  backdrop-filter: blur(2px);
+}
+
+.color-swatch:hover .swatch-overlay-icon {
+  opacity: 1;
+}
+
+.swatch-active {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 2px var(--accent), 0 4px 16px rgba(233, 69, 96, 0.4);
+}
+
+.hex-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hex-input-wrapper .hex-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.copy-btn {
+  width: 32px;
+  height: 32/* ============================================
+   颜色拾取面板组件样式
+   ============================================ */
+
+.color-picker-item.para   颜色拾取面板组件样式
+   =========co   =============================si
+.color-picker-item.panel-open {
+  border-color: r:n  border-color: var(--accent);ol  box-shadow: 0 0 0 2px rgba(hi}
+
+.swatch-overlay-icon {
+  position: absolute;
+  inset: 0;
+  di
+.cop  position: absolute;ac  inset: 0;
+  displano  display:
+}  align-items: ie  justify-content: cer:  background-color: rgba( w  opacity: 0;
+  transition: opacity 0.    transitionop  backdrop-filter: blur(2px);
+} c}
+
+.color-swatch:hover .swat scal  opacity: 1;
+}
+
+.swatch-active {
+  trans
+ }
+
+.swatch-asform  transform: sc
+
+  box-shadow: 0 0 0 2px {
+}
+
+.hex-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6
+@key  display: flex;
+  w   align-items: ad  gap: 6px;
+}
+
+.hex-i22}
+
+.he, 0); }
+   flex: 1;
+  min-width: 0;
+}
+
+gb  min-wid, }
+
+.copy-btn { 100% { box-shado  height: 32/ba   颜色拾取面板组件样式
+   =====================fi   =============================nd
+.color-picker-item.para   颜色拾取面板组?ar   =========co   =============================si
+.colorbo.color-picker-item.panel-open {
+  border-color:ax  border-color: r:n  border-coov
+.swatch-overlay-icon {
+  position: absolute;
+  inset: 0;
+  di
+.cop  position: abs1,   position: absolute;@k  inset: 0;
+  di
+.co{
+  di
+.co   o.coit  displan transform: translateY(-8px) s}  align-items: ie 00  transition: opacity 0.    transitionop  backdrop-filter: blur(2
+.picker-panel-he} c}
+
+.color-swatch:hover .swat scal  opacity: 1;
+}
+
+.swatch-active ace-betw}
+
+.swatch-active {
+  trans
+ }
+
+.swatch-aslor:   trans
+ }
+
+.swry }
+
+.sor
+er-
+  box-shadow: 0 0 0 2px {rder)}
+
+.hex-input-wrapper {
+ {
+    display: flex;
+  fo  aleight: 600;
+}  gapcker-panel-current@key disp  w: flex;
+  align-it}
+
+.hex-i22}
+
+.he, 0); }
+   .picker-
+.he, 0)swa   flex: id  min-widt  }
+
+gb  min-wid  bor
+.copy-btn { ar(   =====================fi   =============================nd
+.color-picker-en.color-picker-item.para   颜色拾取面板组?ar   =====t-.colorbo.color-picker-item.panel-open {
+  border-color:ax  border-color: r:n  border-coov
+.swatch-g:  border-color:ax  border-color: r:n  -y.swatch-overlay-icon {
+  position: absolute;
+  i;
+  position: absolute;-c  inset: 0;
+  di
+.coom  0;
+}
+
+.pic.co-g  di
+.co{
+  di
+.co   o.coit  displan transform: translaol.co v  d--.cot-.picker-panel-he} c}
+
+.color-swatch:hover .swat scal  opacity: 1;
+}
+
+.swatch-active ace-betw}
+
+.swatch-active {
+  trans
+ }
+
+.swatch-aslomp
+.color-swatch:hovet(8}
+
+.swatch-active ace-betw}
+
+.swatch-activ{
+  w
+.swatch-active {
+  tratio  trans
+ }
+
+.swad }
+
+.sar
+--r }
+
+.swry }
+
+.sor
+er-2p
+ so
+.sor
+anser-en  
+ 
+.hex-input-wrapper {
+ {
+    d: v {
+    display: flema );  fo  aleight: 60h-}  gapcker-panel-csf  align-it}
+
+.hex-i22}
+
+.he, 0); }
+   .picbo
+.hex-i22}0 2
+.he, 0)gba   .picke 0.he, 0)swand
+gb  min-wid  bor
+.copy-btn { ar(;
+}.copy-btn { ar(-f.color-picker-en.color-picker-item.para   颜色拾取面板组?ar   ====rd  border-color:ax  border-color: r:n  border-coov
+.swatch-g:  border-color:ax  border-color: r:n  -y.swatch-overlay11.swatch-g:  border-text-muted);
+}
