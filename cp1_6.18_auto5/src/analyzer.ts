@@ -158,17 +158,21 @@ function detectAnomaliesZScore(
 
   if (nums.length < 3) return [];
 
+  const firstVal = nums[0].val;
+  const allSame = nums.every(n => n.val === firstVal);
+  if (allSame) return [];
+
   const sum = nums.reduce((acc, n) => acc + n.val, 0);
   const mean = sum / nums.length;
   const variance = nums.reduce((acc, n) => acc + (n.val - mean) ** 2, 0) / nums.length;
   const stdDev = Math.sqrt(variance);
 
-  if (stdDev === 0) return [];
+  if (!Number.isFinite(stdDev) || stdDev <= Number.EPSILON) return [];
 
   const anomalies: OutlierRow[] = [];
   for (const { idx, val } of nums) {
     const z = Math.abs((val - mean) / stdDev);
-    if (z > threshold) {
+    if (Number.isFinite(z) && z > threshold) {
       anomalies.push({ rowIndex: idx, value: val });
     }
   }

@@ -10,12 +10,16 @@ const TYPE_LABELS: Record<ColumnType, string> = {
 };
 
 function getMissingRateColor(rate: number): string {
-  const t = Math.min(Math.max(rate, 0), 1);
+  const clamped = Math.min(Math.max(rate, 0), 1);
+
+  if (clamped <= 0) return '#38A169';
+  if (clamped >= 1) return '#E53E3E';
+
   const greenR = 56, greenG = 161, greenB = 105;
   const redR = 229, redG = 62, redB = 62;
-  const r = Math.round(greenR + (redR - greenR) * t);
-  const g = Math.round(greenG + (redG - greenG) * t);
-  const b = Math.round(greenB + (redB - greenB) * t);
+  const r = Math.round(greenR + (redR - greenR) * clamped);
+  const g = Math.round(greenG + (redG - greenG) * clamped);
+  const b = Math.round(greenB + (redB - greenB) * clamped);
   return `rgb(${r}, ${g}, ${b})`;
 }
 
@@ -41,7 +45,6 @@ function renderMiniChart(
   const innerW = width - padding.left - padding.right;
   const innerH = height - padding.top - padding.bottom;
   const data = distribution.slice(0, 15);
-  const baseline = padding.top + innerH;
 
   const x = d3.scaleBand()
     .domain(data.map((_, i) => String(i)))
@@ -51,7 +54,7 @@ function renderMiniChart(
   const maxCount = d3.max(data, d => d.count) ?? 1;
   const y = d3.scaleLinear()
     .domain([0, maxCount])
-    .range([baseline, padding.top]);
+    .range([padding.top + innerH, padding.top]);
 
   svg.selectAll('rect.bar-mini')
     .data(data)
@@ -62,14 +65,14 @@ function renderMiniChart(
     .attr('width', x.bandwidth())
     .attr('fill', '#3182CE')
     .attr('rx', 1.5)
-    .attr('y', baseline)
+    .attr('y', y(0))
     .attr('height', 0)
     .transition()
     .delay((_, i) => delay + i * 30)
     .duration(600)
     .ease(d3.easeCubicOut)
     .attr('y', d => y(d.count))
-    .attr('height', d => baseline - y(d.count));
+    .attr('height', d => y(0) - y(d.count));
 }
 
 function renderDetailChart(
@@ -96,7 +99,6 @@ function renderDetailChart(
   const innerW = width - padding.left - padding.right;
   const innerH = height - padding.top - padding.bottom;
   const data = distribution.slice(0, 12);
-  const baseline = padding.top + innerH;
 
   const x = d3.scaleBand()
     .domain(data.map(d => d.value))
@@ -106,7 +108,7 @@ function renderDetailChart(
   const maxCount = d3.max(data, d => d.count) ?? 1;
   const y = d3.scaleLinear()
     .domain([0, maxCount])
-    .range([baseline, padding.top])
+    .range([padding.top + innerH, padding.top])
     .nice();
 
   const yAxis = d3.axisLeft(y).ticks(4).tickSize(-innerW);
@@ -126,14 +128,14 @@ function renderDetailChart(
     .attr('width', x.bandwidth())
     .attr('fill', '#3182CE')
     .attr('rx', 3)
-    .attr('y', baseline)
+    .attr('y', y(0))
     .attr('height', 0)
     .transition()
     .delay((_, i) => 80 + i * 50)
     .duration(700)
     .ease(d3.easeCubicOut)
     .attr('y', d => y(d.count))
-    .attr('height', d => baseline - y(d.count));
+    .attr('height', d => y(0) - y(d.count));
 
   svg.selectAll('text.bar-label')
     .data(data)
@@ -155,7 +157,7 @@ function renderDetailChart(
 
   const xAxis = d3.axisBottom(x).tickSize(0);
   svg.append('g')
-    .attr('transform', `translate(0, ${baseline})`)
+    .attr('transform', `translate(0, ${y(0)})`)
     .call(xAxis)
     .call(g => g.selectAll('.domain').attr('stroke', '#E2E8F0'))
     .call(g => g.selectAll('.tick text')
