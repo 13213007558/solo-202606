@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+
+import os
+
+content = """import { useState, useEffect, useRef } from "react";
 import { EditorView, basicSetup } from "codemirror";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { oneDark } from "@codemirror/theme-one-dark";
@@ -64,8 +67,7 @@ function EditorPanel({ document, content, onChange, canEdit }: EditorPanelProps)
   }, [document]);
 
   const charCount = content.length;
-  const lineCount = content.split("
-").length;
+  const lineCount = content.split("\n").length;
 
   return (<div className="editor-panel">
     <div className="panel-header">
@@ -83,3 +85,9 @@ function EditorPanel({ document, content, onChange, canEdit }: EditorPanelProps)
 }
 
 export default EditorPanel;
+"""
+
+with open("client/src/components/Editor/EditorPanel.tsx", "w") as f:
+    f.write(content)
+print("Done")
+

@@ -1,1 +1,64 @@
-import { useEffect, useRef } from "react"; import { marked } from "marked"; function PreviewPanel({ content }: { content: string }) { const previewRef = useRef<HTMLDivElement>(null); useEffect(() => { if (previewRef.current) { previewRef.current.innerHTML = marked(content); } }, [content]); return (<div className="preview-panel"> <div className="panel-header"> <h3>Preview</h3> </div> <div ref={previewRef} className="preview-container"/> </div>); } export default PreviewPanel;
+import { useState, useEffect, useRef } from "react";
+import { marked } from "marked";
+
+interface PreviewPanelProps {
+  content: string;
+  onShowToast: (message: string, type: "success" | "error") => void;
+}
+
+function PreviewPanel({ content, onShowToast }: PreviewPanelProps) {
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [viewMode, setViewMode] = useState<"preview" | "source">("preview");
+  const [htmlContent, setHtmlContent] = useState("");
+
+  useEffect(() => {
+    const html = marked(content);
+    setHtmlContent(html);
+    if (previewRef.current && viewMode === "preview") {
+      previewRef.current.innerHTML = html;
+    }
+  }, [content, viewMode]);
+
+  const handleToggleView = () => {
+    setViewMode(prev => prev === "preview" ? "source" : "preview");
+  };
+
+  const handleCopy = async () => {
+    try {
+      const text = viewMode === "preview" ? htmlContent : content;
+      await navigator.clipboard.writeText(text);
+      onShowToast("Content copied to clipboard", "success");
+    } catch (err) {
+      onShowToast("Failed to copy content", "error");
+    }
+  };
+
+  const handleOpenNewWindow = () => {
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+      const html = "<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Markdown Preview</title><style>body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; background: #1e1e2e; color: #cdd6f4; } h1 { color: #89b4fa; } h2, h3 { color: #cdd6f4; } code { background: #313244; padding: 2px 6px; border-radius: 4px; } pre { background: #313244; padding: 16px; border-radius: 8px; overflow-x: auto; } blockquote { border-left: 3px solid #89b4fa; padding-left: 16px; color: #a6adc8; } a { color: #89b4fa; } ul, ol { padding-left: 24px; }</style></head><body>" + htmlContent + "</body></html>";
+      newWindow.document.write(html);
+      newWindow.document.close();
+    }
+  };
+
+  return (<div className="preview-panel">
+    <div className="panel-header">
+      <h3>{viewMode === "preview" ? "Preview" : "Source"}</h3>
+      <div className="preview-toolbar">
+        <button className={`toolbar-btn ${viewMode === "source" ? "active" : ""}`} onClick={handleToggleView} title="Toggle Preview/Source">
+          <span>📝</span>
+        </button>
+        <button className="toolbar-btn" onClick={handleCopy} title="Copy Content">
+          <span>📋</span>
+        </button>
+        <button className="toolbar-btn" onClick={handleOpenNewWindow} title="Open in New Window">
+          <span>🖥️</span>
+        </button>
+      </div>
+    </div>
+    {viewMode === "preview" ? (<div ref={previewRef} className="preview-container" />) : (<div className="source-view">{content}</div>)}
+  </div>);
+}
+
+export default PreviewPanel;
