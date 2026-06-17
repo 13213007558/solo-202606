@@ -500,15 +500,16 @@ input {
 }
 
 .modal-enter {
-  animation: modalEnter 0.3s ease forwards;
+  animation: modalEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
 }
 
 @keyframes modalEnter {
-  from {
+  0% {
     opacity: 0;
     transform: translateY(-20px);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
@@ -759,15 +760,16 @@ input {
 }
 
 .card-slide-in {
-  animation: cardSlideIn 0.5s ease both;
+  animation: cardSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
 }
 
 @keyframes cardSlideIn {
-  from {
+  0% {
     opacity: 0;
     transform: translateY(30px);
   }
-  to {
+  100% {
     opacity: 1;
     transform: translateY(0);
   }
@@ -892,18 +894,34 @@ input {
 }
 
 .like-pulse {
-  animation: likePulse 0.3s ease;
+  animation: likePulse 0.3s ease-in-out both;
+  will-change: transform, filter;
+}
+
+.like-pulse svg {
+  animation: likePulse 0.3s ease-in-out both;
 }
 
 @keyframes likePulse {
   0% {
     transform: scale(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.15);
+    filter: brightness(1.4);
   }
   50% {
-    transform: scale(1.25);
+    transform: scale(1.3);
+    filter: brightness(1.6);
+  }
+  75% {
+    transform: scale(1.2);
+    filter: brightness(1.45);
   }
   100% {
     transform: scale(1);
+    filter: brightness(1);
   }
 }
 
@@ -1416,90 +1434,6 @@ input {
 }
 
 /* ============================================
-   关键帧动画 - 卡片滑入
-   ============================================ */
-
-@keyframes keyframes-card-slide-in {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.card-slide-in {
-  animation-name: keyframes-card-slide-in;
-  animation-duration: 0.5s;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-  animation-fill-mode: both;
-  will-change: transform, opacity;
-}
-
-/* ============================================
-   关键帧动画 - 模态框渐入上移
-   ============================================ */
-
-@keyframes keyframes-modal-enter {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.modal-enter {
-  animation-name: keyframes-modal-enter;
-  animation-duration: 0.3s;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-  animation-fill-mode: both;
-  will-change: transform, opacity;
-}
-
-/* ============================================
-   点赞按钮脉冲放大动画
-   ============================================ */
-
-@keyframes keyframes-like-pulse {
-  0% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  25% {
-    transform: scale(1.15);
-    filter: brightness(1.4);
-  }
-  50% {
-    transform: scale(1.3);
-    filter: brightness(1.6);
-  }
-  75% {
-    transform: scale(1.2);
-    filter: brightness(1.45);
-  }
-  100% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-}
-
-.like-pulse {
-  animation-name: keyframes-like-pulse;
-  animation-duration: 0.3s;
-  animation-timing-function: ease-in-out;
-  animation-fill-mode: both;
-}
-
-.like-pulse svg {
-  animation: keyframes-like-pulse 0.3s ease-in-out both;
-}
-
-/* ============================================
    @dnd-kit 拖拽相关样式
    ============================================ */
 
@@ -1531,12 +1465,4 @@ input {
   opacity: 0.5;
   transform: scale(0.98);
   box-shadow: inset 0 0 0 2px var(--accent);
-}
-
-/* 拖拽时整个 body 禁止文字选中，提升体验 */
-
-body.dragging-active {
-  user-select: none;
-  -webkit-user-select: none;
-  cursor: grabbing !important;
 }
