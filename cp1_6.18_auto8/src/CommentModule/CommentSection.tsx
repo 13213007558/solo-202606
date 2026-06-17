@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled from '@emotion/styled';
+import { css, keyframes } from '@emotion/react';
 import { theme } from '../theme';
 import { Comment, CommentWithChildren } from '../types';
 import { commentApi } from '../api';
 import { useAuth } from '../context/AuthContext';
-import { emojiList } from '../emojiList';
+import { emojiCategories } from '../emojiList';
 import { wsClient } from '../websocket';
 
 interface CommentSectionProps {
@@ -86,34 +87,180 @@ const EmojiButton = styled.button`
   }
 `;
 
-const EmojiPicker = styled.div`
-  position: absolute;
-  bottom: 100%;
-  left: 0;
+const panelFadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+`;
+
+const EmojiPanelContainer = styled.div<{ x: number; y: number }>`
+  position: fixed;
+  left: ${(props) => props.x}px;
+  top: ${(props) => props.y}px;
   background: ${theme.colors.card};
+  border-radius: ${theme.borderRadius.md};
+  box-shadow: ${theme.shadows.lg};
+  z-index: 1000;
+  width: 320px;
+  overflow: hidden;
+  animation: ${panelFadeIn} 0.25s ease-out;
   border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.borderRadius.sm};
-  padding: 12px;
+  user-select: none;
+`;
+
+const PanelHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, ${theme.colors.primary}15 0%, ${theme.colors.primaryLight}15 100%);
+  cursor: move;
+  border-bottom: 1px solid ${theme.colors.border};
+`;
+
+const PanelTitle = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${theme.colors.text};
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const PanelDragHandle = styled.div`
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  cursor: move;
+  opacity: 0.6;
+  transition: opacity ${theme.transitions.fast};
+
+  &:hover {
+    opacity: 1;
+  }
+`;
+
+const DragDot = styled.div`
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: ${theme.colors.textLight};
+`;
+
+const CategoryTabs = styled.div`
+  display: flex;
+  position: relative;
+  border-bottom: 1px solid ${theme.colors.border};
+  background: ${theme.colors.background};
+`;
+
+const CategoryTab = styled.button<{ active: boolean; index: number }>`
+  flex: 1;
+  padding: 10px 8px;
+  font-size: 18px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: all ${theme.transitions.normal};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 8px;
+    background: ${theme.colors.text};
+    color: #fff;
+    font-size: 11px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity ${theme.transitions.fast}, transform ${theme.transitions.fast};
+  }
+
+  &:hover {
+    background: ${theme.colors.primary}10;
+
+    &::before {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+  }
+
+  ${(props) =>
+    props.active &&
+    css`
+      color: ${theme.colors.primary};
+      background: ${theme.colors.primary}15;
+    `}
+`;
+
+const TabIndicator = styled.div<{ activeIndex: number; tabCount: number }>`
+  position: absolute;
+  bottom: -1px;
+  left: ${(props) => (props.activeIndex * 100) / props.tabCount}%;
+  width: ${(props) => 100 / props.tabCount}%;
+  height: 2px;
+  background: ${theme.colors.primary};
+  transition: left ${theme.transitions.normal}, width ${theme.transitions.normal};
+`;
+
+const EmojiGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  gap: 4px;
-  z-index: 10;
-  box-shadow: ${theme.shadows.md};
-  max-height: 200px;
+  gap: 2px;
+  padding: 12px;
+  max-height: 240px;
   overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${theme.colors.border};
+    border-radius: 3px;
+
+    &:hover {
+      background: ${theme.colors.textLight};
+    }
+  }
 `;
 
 const EmojiItem = styled.button`
-  font-size: 18px;
-  padding: 4px;
+  font-size: 20px;
+  padding: 6px;
   border: none;
   background: transparent;
   cursor: pointer;
   border-radius: ${theme.borderRadius.sm};
-  transition: background ${theme.transitions.fast};
+  transition: all ${theme.transitions.fast};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
-    background: ${theme.colors.background};
+    background: ${theme.colors.primary}15;
+    transform: scale(1.2);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -308,6 +455,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(0);
+  const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -315,7 +466,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId }) => {
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newCommentIds, setNewCommentIds] = useState<Set<string>>(new Set());
-  const emojiRef = useRef<HTMLDivElement>(null);
+  const emojiButtonRef = useRef<HTMLButtonElement>(null);
+  const emojiPanelRef = useRef<HTMLDivElement>(null);
+  const inputAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadComments(1);
@@ -348,13 +501,80 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId }) => {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (emojiRef.current && !emojiRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const isPanelClick = emojiPanelRef.current?.contains(target);
+      const isButtonClick = emojiButtonRef.current?.contains(target);
+
+      if (!isPanelClick && !isButtonClick) {
         setShowEmojiPicker(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (isDragging) return;
+
+    const panelRect = emojiPanelRef.current?.getBoundingClientRect();
+    if (!panelRect) return;
+
+    setDragOffset({
+      x: e.clientX - panelRect.left,
+      y: e.clientY - panelRect.top,
+    });
+    setIsDragging(true);
+  }, [isDragging]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+
+      const newX = e.clientX - dragOffset.x;
+      const newY = e.clientY - dragOffset.y;
+
+      const maxX = window.innerWidth - 320;
+      const maxY = window.innerHeight - 350;
+
+      setPanelPosition({
+        x: Math.max(0, Math.min(newX, maxX)),
+        y: Math.max(0, Math.min(newY, maxY)),
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragOffset]);
+
+  const handleEmojiButtonClick = () => {
+    if (showEmojiPicker) {
+      setShowEmojiPicker(false);
+    } else {
+      const buttonRect = emojiButtonRef.current?.getBoundingClientRect();
+      if (buttonRect) {
+        const initialX = buttonRect.left;
+        const initialY = buttonRect.top - 380;
+
+        setPanelPosition({
+          x: Math.max(0, Math.min(initialX, window.innerWidth - 320)),
+          y: Math.max(0, Math.min(initialY, window.innerHeight - 350)),
+        });
+      }
+      setActiveCategory(0);
+      setShowEmojiPicker(true);
+    }
+  };
 
   const loadComments = async (pageNum: number) => {
     try {
@@ -490,28 +710,24 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId }) => {
         <InputContainer>
           <InputWrapper>
             <UserAvatar src={user?.avatar} alt={user?.username} />
-            <InputArea ref={emojiRef}>
+            <InputArea ref={inputAreaRef}>
               <Textarea
                 placeholder="分享你的看法..."
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
               />
-              {showEmojiPicker && (
-                <EmojiPicker>
-                  {emojiList.map((emoji, index) => (
-                    <EmojiItem key={index} onClick={() => handleEmojiClick(emoji)}>
-                      {emoji}
-                    </EmojiItem>
-                  ))}
-                </EmojiPicker>
-              )}
               <InputActions>
-                <EmojiButton onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+                <EmojiButton
+                  ref={emojiButtonRef}
+                  onClick={handleEmojiButtonClick}
+                  type="button"
+                >
                   😊
                 </EmojiButton>
                 <SubmitButton
                   onClick={handleSubmitComment}
                   disabled={!newComment.trim() || submitting}
+                  type="button"
                 >
                   发表评论
                 </SubmitButton>
@@ -531,6 +747,60 @@ const CommentSection: React.FC<CommentSectionProps> = ({ recipeId }) => {
         <LoadMoreButton onClick={() => loadComments(page + 1)} disabled={loading}>
           {loading ? '加载中...' : '加载更多评论'}
         </LoadMoreButton>
+      )}
+
+      {showEmojiPicker && (
+        <EmojiPanelContainer
+          ref={emojiPanelRef}
+          x={panelPosition.x}
+          y={panelPosition.y}
+          style={{
+            cursor: isDragging ? 'grabbing' : 'default',
+          }}
+        >
+          <PanelHeader onMouseDown={handleMouseDown}>
+            <PanelTitle>
+              <span>😊</span>
+              <span>选择表情</span>
+            </PanelTitle>
+            <PanelDragHandle>
+              <DragDot />
+              <DragDot />
+              <DragDot />
+            </PanelDragHandle>
+          </PanelHeader>
+
+          <CategoryTabs>
+            {emojiCategories.map((category, index) => (
+              <CategoryTab
+                key={category.name}
+                active={activeCategory === index}
+                index={index}
+                data-label={category.name}
+                onClick={() => setActiveCategory(index)}
+                type="button"
+              >
+                {category.icon}
+              </CategoryTab>
+            ))}
+            <TabIndicator
+              activeIndex={activeCategory}
+              tabCount={emojiCategories.length}
+            />
+          </CategoryTabs>
+
+          <EmojiGrid>
+            {emojiCategories[activeCategory].emojis.map((emoji, index) => (
+              <EmojiItem
+                key={`${activeCategory}-${index}`}
+                onClick={() => handleEmojiClick(emoji)}
+                type="button"
+              >
+                {emoji}
+              </EmojiItem>
+            ))}
+          </EmojiGrid>
+        </EmojiPanelContainer>
       )}
     </SectionContainer>
   );
