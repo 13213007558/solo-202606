@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import CourseCard from '../components/CourseCard';
 import StatsOverview from '../components/StatsOverview';
 import { courseApi, statsApi } from '../api';
@@ -19,10 +19,7 @@ const CourseListPage: React.FC = () => {
         courseApi.getAll(),
         statsApi.get(),
       ]);
-      const sortedCourses = [...coursesData].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-      setCourses(sortedCourses);
+      setCourses(coursesData);
       setStats(statsData);
     } catch (error) {
       console.error('加载数据失败:', error);
@@ -35,6 +32,12 @@ const CourseListPage: React.FC = () => {
     fetchData();
   }, []);
 
+  const sortedCourses = useMemo(() => {
+    return [...courses].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+  }, [courses]);
+
   if (loading) {
     return <div className="loading">加载中...</div>;
   }
@@ -43,9 +46,9 @@ const CourseListPage: React.FC = () => {
     <div>
       <h2 className="page-title">我的课程</h2>
       <StatsOverview stats={stats} />
-      {courses.length > 0 ? (
+      {sortedCourses.length > 0 ? (
         <div className="course-list">
-          {courses.map((course) => (
+          {sortedCourses.map((course) => (
             <CourseCard key={course.id} course={course} />
           ))}
         </div>
