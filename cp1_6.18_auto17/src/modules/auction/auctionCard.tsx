@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface AuctionCardProps {
@@ -29,39 +29,28 @@ const calculateTimeLeft = (endTime: number): TimeLeft => {
 };
 
 const formatPrice = (price: number): string => {
-  return price.toLocaleString("zh-CN");
+  if (price <= 0) return '暂无出价';
+  return '¥' + price.toLocaleString('zh-CN');
 };
 
 const padZero = (num: number): string => {
-  return num.toString().padStart(2, "0");
+  return num.toString().padStart(2, '0');
 };
 
-const FlipDigit = ({ value, urgent }: { value: string; urgent: boolean }) => {
-  const [displayValue, setDisplayValue] = useState(value);
-  const [isFlipping, setIsFlipping] = useState(false);
-  const prevValueRef = useRef(value);
-
-  useEffect(() => {
-    if (prevValueRef.current !== value) {
-      setIsFlipping(true);
-      const timer = setTimeout(() => {
-        setDisplayValue(value);
-        setIsFlipping(false);
-        prevValueRef.current = value;
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [value]);
-
-  return (
-    <div className={`flip-digit ${isFlipping ? 'flipping' : ''} ${urgent ? 'urgent' : ''}`}>
-      <div className="flip-digit-inner">
-        <div className="flip-digit-front">{displayValue}</div>
-        <div className="flip-digit-back">{value}</div>
-      </div>
-    </div>
-  );
-};
+const HeartIcon = ({ filled }: { filled: boolean }) => (
+  <svg
+    viewBox="0 0 24 24"
+    width="18"
+    height="18"
+    fill={filled ? '#D69E2E' : 'none'}
+    stroke={filled ? '#D69E2E' : '#A0AEC0'}
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);
 
 export default function AuctionCard({
   id,
@@ -73,48 +62,63 @@ export default function AuctionCard({
 }: AuctionCardProps) {
   const navigate = useNavigate();
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => calculateTimeLeft(endTime));
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft(endTime));
     }, 1000);
-
     return () => clearInterval(timer);
   }, [endTime]);
 
-  const isUrgent = timeLeft.total < 3600000 && timeLeft.total > 0;
+  const isEnded = timeLeft.total <= 0;
 
-  const handleClick = () => {
-    navigate(`/auction/${id}`);
-  };
+  const handleCardClick = useCallback(() => {
+    if (!isEnded) {
+      navigate(`/auction/${id}`);
+    }
+  }, [id, isEnded, navigate]);
 
-  const hoursStr = padZero(timeLeft.hours);
-  const minutesStr = padZero(timeLeft.minutes);
-  const secondsStr = padZero(timeLeft.seconds);
+  const handleFavoriteClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsFavorited((prev) => !prev);
+  }, []);
+
+  const countdownText = `${padZero(timeLeft.hours)}:${padZero(timeLeft.minutes)}:${padZero(timeLeft.seconds)}`;
 
   return (
-    <div className="auction-card" onClick={handleClick}>
+    <div
+      className={`auction-card ${isEnded ? 'auction-card-ended' : ''}`}
+      onClick={handleCardClick}
+    >
+      {isEnded && (
+        <div className="auction-card-ended-badge">
+          已结束
+        </div>
+      )}
       <img src={coverImage} alt={name} className="auction-card-image" />
       <div className="auction-card-body">
         <h3 className="auction-card-name">{name}</h3>
         <p className="auction-card-description">{description}</p>
         <div className="auction-card-price">
           <span className="price-label">当前价</span>
-          <span className="price-value">¥{formatPrice(currentPrice)}</span>
+          <span className="price-value">{formatPrice(currentPrice)}</span>
         </div>
-        <div className="countdown-container">
-          <div className="countdown-unit">
-            <FlipDigit value={hoursStr} urgent={isUrgent} />
-            <span className="countdown-label">HH</span>
+        <div className="auction-card-footer">
+          <div className="auction-card-countdown">
+            <span className="countdown-text-label">剩余时间</span>
+            <span className={`countdown-text-value ${isEnded ? 'ended' : ''}`}>
+              {isEnded ? '已结束' : countdownText}
+            </span>
           </div>
-          <div className="countdown-unit">
-            <FlipDigit value={minutesStr} urgent={isUrgent} />
-            <span className="countdown-label">MM</span>
-          </div>
-          <div className="countdown-unit">
-            <FlipDigit value={secondsStr} urgent={isUrgent} />
-            <span className="countdown-label">SS</span>
-          </div>
+          <button
+            type="button"
+            className={`card-favorite-btn ${isFavorited ? 'favorited' : ''}`}
+            onClick={handleFavoriteClick}
+            aria-label={isFavorited ? '取消收藏' : '收藏'}
+          >
+            <HeartIcon filled={isFavorited} />
+          </button>
         </div>
       </div>
     </div>
