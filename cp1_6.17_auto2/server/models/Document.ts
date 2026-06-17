@@ -1,3 +1,74 @@
-import mongoose, { Schema, Document as MongooseDocument } from "mongoose"; export interface DocumentUser { userId: string; role: "owner" | "editor" | "viewer"; } export interface DocumentVersion { content: string; timestamp: Date; isRestore?: boolean; } export interface Document extends MongooseDocument { title: string; content: string; owner: string; status: "draft" | "review" | "completed"; users: DocumentUser[]; versions: DocumentVersion[]; createdAt: Date; updatedAt: Date; } const DocumentSchema = new Schema<Document>({ title: { type: String, required: true, trim: true }, content: { type: String, required: true, default: "# New Document
+import mongoose, { Schema, Document as MongooseDocument } from "mongoose";
 
-Start editing here..." }, owner: { type: String, required: true }, status: { type: String, enum: ["draft", "review", "completed"], default: "draft" }, users: [{ userId: { type: String, required: true }, role: { type: String, enum: ["owner", "editor", "viewer"], required: true } }], versions: [{ content: { type: String, required: true }, timestamp: { type: Date, required: true }, isRestore: { type: Boolean, default: false } }] }, { timestamps: true }); export default mongoose.model<Document>("Document", DocumentSchema);
+export interface DocumentUser {
+  userId: string;
+  role: "owner" | "editor" | "viewer";
+}
+
+export interface DocumentVersion {
+  content: string;
+  timestamp: Date;
+  isRestore?: boolean;
+}
+
+export interface Document extends MongooseDocument {
+  title: string;
+  content: string;
+  owner: string;
+  status: "draft" | "review" | "completed";
+  users: DocumentUser[];
+  versions: DocumentVersion[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const DocumentSchema = new Schema<Document>({
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  content: {
+    type: String,
+    required: true,
+    default: "# New Document\n\nStart editing here..."
+  },
+  owner: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ["draft", "review", "completed"],
+    default: "draft"
+  },
+  users: [{
+    userId: {
+      type: String,
+      required: true
+    },
+    role: {
+      type: String,
+      enum: ["owner", "editor", "viewer"],
+      required: true
+    }
+  }],
+  versions: [{
+    content: {
+      type: String,
+      required: true
+    },
+    timestamp: {
+      type: Date,
+      required: true
+    },
+    isRestore: {
+      type: Boolean,
+      default: false
+    }
+  }]
+}, {
+  timestamps: true
+});
+
+export default mongoose.model<Document>("Document", DocumentSchema);
