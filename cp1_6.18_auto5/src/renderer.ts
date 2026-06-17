@@ -10,10 +10,12 @@ const TYPE_LABELS: Record<ColumnType, string> = {
 };
 
 function getMissingRateColor(rate: number): string {
-  const t = Math.min(rate * 2.5, 1);
-  const r = Math.round(56 + (229 - 56) * t);
-  const g = Math.round(161 + (62 - 161) * t);
-  const b = Math.round(105 + (62 - 105) * t);
+  const t = Math.min(Math.max(rate, 0), 1);
+  const greenR = 56, greenG = 161, greenB = 105;
+  const redR = 229, redG = 62, redB = 62;
+  const r = Math.round(greenR + (redR - greenR) * t);
+  const g = Math.round(greenG + (redG - greenG) * t);
+  const b = Math.round(greenB + (redB - greenB) * t);
   return `rgb(${r}, ${g}, ${b})`;
 }
 
@@ -26,9 +28,9 @@ function renderMiniChart(
   if (distribution.length === 0) return;
 
   const rect = container.getBoundingClientRect();
-  const width = rect.width || 260;
-  const height = rect.height || 44;
-  const padding = { top: 2, right: 2, bottom: 0, left: 2 };
+  const width = Math.max(rect.width, 200);
+  const height = Math.max(rect.height, 44);
+  const padding = { top: 2, right: 2, bottom: 2, left: 2 };
 
   const svg = d3.select(container)
     .append('svg')
@@ -39,6 +41,7 @@ function renderMiniChart(
   const innerW = width - padding.left - padding.right;
   const innerH = height - padding.top - padding.bottom;
   const data = distribution.slice(0, 15);
+  const baseline = padding.top + innerH;
 
   const x = d3.scaleBand()
     .domain(data.map((_, i) => String(i)))
@@ -48,24 +51,25 @@ function renderMiniChart(
   const maxCount = d3.max(data, d => d.count) ?? 1;
   const y = d3.scaleLinear()
     .domain([0, maxCount])
-    .range([padding.top + innerH, padding.top]);
+    .range([baseline, padding.top]);
 
-  svg.selectAll('rect')
+  svg.selectAll('rect.bar-mini')
     .data(data)
     .enter()
     .append('rect')
+    .attr('class', 'bar-mini')
     .attr('x', (_, i) => x(String(i)) ?? 0)
     .attr('width', x.bandwidth())
     .attr('fill', '#3182CE')
     .attr('rx', 1.5)
-    .attr('y', y(0))
+    .attr('y', baseline)
     .attr('height', 0)
     .transition()
     .delay((_, i) => delay + i * 30)
     .duration(600)
     .ease(d3.easeCubicOut)
     .attr('y', d => y(d.count))
-    .attr('height', d => y(0) - y(d.count));
+    .attr('height', d => baseline - y(d.count));
 }
 
 function renderDetailChart(
@@ -92,6 +96,7 @@ function renderDetailChart(
   const innerW = width - padding.left - padding.right;
   const innerH = height - padding.top - padding.bottom;
   const data = distribution.slice(0, 12);
+  const baseline = padding.top + innerH;
 
   const x = d3.scaleBand()
     .domain(data.map(d => d.value))
@@ -101,7 +106,7 @@ function renderDetailChart(
   const maxCount = d3.max(data, d => d.count) ?? 1;
   const y = d3.scaleLinear()
     .domain([0, maxCount])
-    .range([padding.top + innerH, padding.top])
+    .range([baseline, padding.top])
     .nice();
 
   const yAxis = d3.axisLeft(y).ticks(4).tickSize(-innerW);
@@ -121,14 +126,14 @@ function renderDetailChart(
     .attr('width', x.bandwidth())
     .attr('fill', '#3182CE')
     .attr('rx', 3)
-    .attr('y', y(0))
+    .attr('y', baseline)
     .attr('height', 0)
     .transition()
     .delay((_, i) => 80 + i * 50)
     .duration(700)
     .ease(d3.easeCubicOut)
     .attr('y', d => y(d.count))
-    .attr('height', d => y(0) - y(d.count));
+    .attr('height', d => baseline - y(d.count));
 
   svg.selectAll('text.bar-label')
     .data(data)
@@ -150,7 +155,7 @@ function renderDetailChart(
 
   const xAxis = d3.axisBottom(x).tickSize(0);
   svg.append('g')
-    .attr('transform', `translate(0, ${padding.top + innerH})`)
+    .attr('transform', `translate(0, ${baseline})`)
     .call(xAxis)
     .call(g => g.selectAll('.domain').attr('stroke', '#E2E8F0'))
     .call(g => g.selectAll('.tick text')
@@ -224,7 +229,8 @@ function createCard(report: ColumnReport, index: number): HTMLElement {
     const chartWrap = card.querySelector('.mini-chart-wrap') as HTMLElement;
     const fill = card.querySelector('.progress-fill') as HTMLElement;
     if (fill) {
-      fill.style.background = getMissingRateColor(report.missingRate);
+      const color = getMissingRateColor(report.missingRate);
+      fill.style.background = color;
       fill.style.width = Math.min(report.missingRate * 100, 100) + '%';
     }
     if (chartWrap) {

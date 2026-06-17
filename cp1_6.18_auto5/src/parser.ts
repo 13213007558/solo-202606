@@ -64,9 +64,12 @@ function parseJSON(text: string): Record<string, unknown>[] {
   throw new Error('JSON 格式不正确，必须是对象或对象数组');
 }
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 export async function parseFile(file: File): Promise<DataFrame> {
-  if (file.size > 10 * 1024 * 1024) {
-    throw new Error('文件过大，最大支持 10MB');
+  if (file.size > MAX_FILE_SIZE) {
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    throw new Error(`文件过大（${sizeMB}MB），最大支持 10MB，请上传更小的文件`);
   }
 
   const format = detectFormat(file.name);

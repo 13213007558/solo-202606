@@ -15,6 +15,8 @@ export interface ColumnReport {
   uniqueCount: number;
   outlierCount: number;
   outlierRate: number;
+  anomalyCount: number;
+  anomalyRatio: number;
   outliers: OutlierRow[];
   valueDistribution: { value: string; count: number }[];
   min?: number;
@@ -137,6 +139,43 @@ function detectOutliers(
   return outliers;
 }
 
+function detectAnomaliesZScore(
+  values: unknown[],
+  type: ColumnType,
+  threshold = 2.5
+): OutlierRow[] {
+  if (type !== 'number') return [];
+
+  const nums: { idx: number; val: number }[] = [];
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i];
+    if (isNullish(v)) continue;
+    const n = Number(v);
+    if (!Number.isNaN(n) && Number.isFinite(n)) {
+      nums.push({ idx: i, val: n });
+    }
+  }
+
+  if (nums.length < 3) return [];
+
+  const sum = nums.reduce((acc, n) => acc + n.val, 0);
+  const mean = sum / nums.length;
+  const variance = nums.reduce((acc, n) => acc + (n.val - mean) ** 2, 0) / nums.length;
+  const stdDev = Math.sqrt(variance);
+
+  if (stdDev === 0) return [];
+
+  const anomalies: OutlierRow[] = [];
+  for (const { idx, val } of nums) {
+    const z = Math.abs((val - mean) / stdDev);
+    if (z > threshold) {
+      anomalies.push({ rowIndex: idx, value: val });
+    }
+  }
+
+  return anomalies;
+}
+
 function computeNumericStats(values: unknown[]): {
   min?: number; max?: number; mean?: number; median?: number; stdDev?: number;
 } {
@@ -233,6 +272,13 @@ export function analyze(df: DataFrame): ColumnReport[] {
     const outlierCount = outliers.length;
     const outlierRate = totalCount > 0 ? outlierCount / totalCount : 0;
 
+    const anomalyRows = detectAnomaliesZScore(values, type, 2.5);
+    const outlierIndexSet = new Set(outliers.map(o => o.rowIndex));
+    const uniqueAnomalies = anomalyRows.filter(a => !outlierIndexSet.has(a.rowIndex));
+    const allAnomalies = [...outliers, ...uniqueAnomalies];
+    const anomalyCount = allAnomalies.length;
+    const anomalyRatio = totalCount > 0 ? anomalyCount / totalCount : 0;
+
     const valueDistribution = buildDistribution(values, type);
 
     const stats: Partial<ColumnReport> = {};
@@ -250,7 +296,9 @@ export function analyze(df: DataFrame): ColumnReport[] {
       uniqueCount,
       outlierCount,
       outlierRate,
-      outliers: outliers.slice(0, 100),
+      anomalyCount,
+      anomalyRatio,
+      outliers: allAnomalies.slice(0, 100),
       valueDistribution,
       ...stats
     };
