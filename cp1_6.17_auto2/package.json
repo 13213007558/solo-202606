@@ -1,0 +1,38 @@
+{
+  "name": "markdown-collab",
+  "version": "1.0.0",
+  "description": "Real-time collaborative markdown editor",
+  "scripts": {
+    "dev:front": "cd client && vite",
+    "dev:back": "nodemon server/index.ts",
+    "build:front": "cd client && vite build",
+    "build:back": "tsc -p server/tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
+    "mongoose": "^7.5.0",
+    "marked": "^9.1.2",
+    "codemirror": "^6.0.1",
+    "@codemirror/lang-markdown": "^6.2.0",
+    "@codemirror/language": "^6.9.0",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.23.0",
+    "@types/node": "^20.5.0",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "@types/express": "^4.17.17",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.9",
+    "vite-plugin-react": "^4.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1"
+  }
+}
