@@ -15,7 +15,7 @@ interface CanvasProps {
 }
 
 export interface CanvasRef {
-  exportPNG: () => void;
+  exportPNG: () => string;
 }
 
 interface Transform {
@@ -44,6 +44,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
   const [panStart, setPanStart] = useState<{ x: number; y: number } | null>(null);
   const [editingStickyId, setEditingStickyId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
+  const [selectedStickyId, setSelectedStickyId] = useState<string | null>(null);
   const [compositeBitmap, setCompositeBitmap] = useState<HTMLCanvasElement | null>(null);
   const [cursorPosition, setCursorPosition] = useState<Point>({ x: 0, y: 0 });
 
@@ -53,13 +54,13 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
   useImperativeHandle(ref, () => ({
     exportPNG: () => {
       const canvas = canvasRef.current;
-      if (!canvas) return;
+      if (!canvas) return '';
 
       const exportCanvas = document.createElement('canvas');
       exportCanvas.width = canvas.width;
       exportCanvas.height = canvas.height;
       const ctx = exportCanvas.getContext('2d');
-      if (!ctx) return;
+      if (!ctx) return '';
 
       ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
@@ -68,13 +69,10 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
       ctx.translate(transform.offsetX, transform.offsetY);
       ctx.scale(transform.scale, transform.scale);
 
-      elements.forEach((el) => drawElement(ctx, el));
+      elements.forEach((el) => drawElement(ctx, el, false));
       ctx.restore();
 
-      const link = document.createElement('a');
-      link.download = `whiteboard-${roomId}-${Date.now()}.png`;
-      link.href = exportCanvas.toDataURL('image/png');
-      link.click();
+      return exportCanvas.toDataURL('image/png');
     },
   }));
 
@@ -99,6 +97,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
     if (currentTool === 'pan' || e.button === 1 || (e.button === 0 && e.altKey)) {
       setIsPanning(true);
       setPanStart({ x: e.clientX - transform.offsetX, y: e.clientY - transform.offsetY });
+      setSelectedStickyId(null);
       return;
     }
 
@@ -113,13 +112,23 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
           createdAt: Date.now(),
           targetId: targetEl.id,
         });
+        if (selectedStickyId === targetEl.id) {
+          setSelectedStickyId(null);
+        }
       }
       return;
     }
 
     if (currentTool === 'sticky') {
-      const existingSticky = findStickyAtPoint(point);
-      if (existingSticky) {
+      const clickedSticky = findStickyAtPoint(point);
+      if (clickedSticky) {
+        if (selectedStickyId === clickedSticky.id) {
+          setEditingStickyId(clickedSticky.id);
+          setEditingText(clickedSticky.text);
+          setSelectedStickyId(null);
+        } else {
+          setSelectedStickyId(clickedSticky.id);
+        }
         return;
       }
       const newSticky: StickyElement = {
@@ -129,12 +138,15 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
         color: currentColor,
         createdAt: Date.now(),
         position: point,
-        text: '双击编辑',
+        text: '点击编辑',
       };
       onDrawElement(newSticky);
-      setEditingStickyId(newSticky.id);
-      setEditingText(newSticky.text);
+      setSelectedStickyId(newSticky.id);
       return;
+    }
+
+    if (currentTool === 'pen' || currentTool === 'rectangle' || currentTool === 'circle') {
+      setSelectedStickyId(null);
     }
 
     setIsDrawing(true);
@@ -237,14 +249,44 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
     }
   };
 
-  const handleDoubleClick = (e: React.MouseEvent) => {
-    const point = getCanvasPoint(e.clientX, e.clientY);
-    const sticky = findStickyAtPoint(point);
-    if (sticky) {
-      setEditingStickyId(sticky.id);
-      setEditingText(sticky.text);
-    }
-  };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && selectedStickyId && !editingStickyId) {
+        const sticky = elements.find((el) => el.id === selectedStickyId) as StickyElement | undefined;
+        if (sticky) {
+          setEditingStickyId(sticky.id);
+          setEditingText(sticky.text);
+          setSelectedStickyId(null);
+        }
+      }
+      if (e.key === 'Escape') {
+        if (editingStickyId) {
+          const textarea = document.activeElement as HTMLTextAreaElement | null;
+          if (textarea) {
+            textarea.blur();
+          }
+        } else {
+          setSelectedStickyId(null);
+        }
+      }
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedStickyId && !editingStickyId) {
+          e.preventDefault();
+          onDrawElement({
+            id: generateId(),
+            type: 'eraser',
+            userId,
+            color: currentColor,
+            createdAt: Date.now(),
+            targetId: selectedStickyId,
+          });
+          setSelectedStickyId(null);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedStickyId, editingStickyId, elements, userId, currentColor]);
 
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
@@ -326,7 +368,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
     return false;
   };
 
-  const drawElement = (ctx: CanvasRenderingContext2D, element: CanvasElement) => {
+  const drawElement = (ctx: CanvasRenderingContext2D, element: CanvasElement, isSelected: boolean = false) => {
     ctx.save();
     ctx.strokeStyle = element.color;
     ctx.fillStyle = element.color;
@@ -358,6 +400,15 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
     } else if (element.type === 'sticky') {
       ctx.fillStyle = 'rgba(255, 235, 59, 0.95)';
       ctx.fillRect(element.position.x, element.position.y, 180, 130);
+
+      if (isSelected) {
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 4]);
+        ctx.strokeRect(element.position.x - 4, element.position.y - 4, 188, 138);
+        ctx.setLineDash([]);
+      }
+
       ctx.strokeStyle = element.color;
       ctx.lineWidth = 2;
       ctx.strokeRect(element.position.x, element.position.y, 180, 130);
@@ -404,7 +455,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
       if (!ctx) return;
 
       const oldestElements = elements.slice(0, 200);
-      oldestElements.forEach((el) => drawElement(ctx, el));
+      oldestElements.forEach((el) => drawElement(ctx, el, false));
       setCompositeBitmap(composite);
     }
   }, [elements.length]);
@@ -429,7 +480,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
 
   useEffect(() => {
     render();
-  }, [elements, currentElement, transform, users, compositeBitmap]);
+  }, [elements, currentElement, transform, users, compositeBitmap, selectedStickyId]);
 
   const render = () => {
     const canvas = canvasRef.current;
@@ -456,12 +507,12 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
     const elementsToRender = compositeBitmap ? elements.slice(200) : elements;
     elementsToRender.forEach((el) => {
       if (el.id !== editingStickyId) {
-        drawElement(ctx, el);
+        drawElement(ctx, el, el.id === selectedStickyId);
       }
     });
 
     if (currentElement) {
-      drawElement(ctx, currentElement);
+      drawElement(ctx, currentElement, false);
     }
 
     ctx.restore();
@@ -548,7 +599,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
           width: 180 * transform.scale,
           height: 130 * transform.scale,
           backgroundColor: 'rgba(255, 235, 59, 0.95)',
-          border: `2px solid ${sticky.color}`,
+          border: `3px solid #ffffff`,
           borderRadius: 0,
           padding: 10 * transform.scale,
           fontSize: 14 * transform.scale,
@@ -558,8 +609,39 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
           outline: 'none',
           zIndex: 100,
           boxSizing: 'border-box',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
         }}
       />
+    );
+  };
+
+  const renderSelectedHint = () => {
+    if (!selectedStickyId || editingStickyId) return null;
+    const sticky = elements.find((el) => el.id === selectedStickyId) as StickyElement | undefined;
+    if (!sticky) return null;
+
+    const screenX = sticky.position.x * transform.scale + transform.offsetX;
+    const screenY = (sticky.position.y - 28) * transform.scale + transform.offsetY;
+
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          left: screenX,
+          top: screenY,
+          backgroundColor: 'rgba(233, 69, 96, 0.9)',
+          color: '#ffffff',
+          padding: '4px 10px',
+          borderRadius: '6px',
+          fontSize: '11px',
+          whiteSpace: 'nowrap',
+          zIndex: 60,
+          pointerEvents: 'none',
+          animation: 'fadeIn 0.15s ease',
+        }}
+      >
+        按 Enter 或再次点击编辑 · Delete 删除
+      </div>
     );
   };
 
@@ -614,7 +696,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
       return { cursor: 'crosshair' };
     }
     if (currentTool === 'sticky') {
-      return { cursor: 'text' };
+      return { cursor: 'pointer' };
     }
     return { cursor: 'crosshair' };
   };
@@ -634,7 +716,6 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      onDoubleClick={handleDoubleClick}
       onWheel={handleWheel}
     >
       <canvas
@@ -646,6 +727,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
         }}
       />
       {renderCursors()}
+      {renderSelectedHint()}
       {renderEditingSticky()}
     </div>
   );
