@@ -167,6 +167,7 @@ function detectAnomaliesZScore(
   const variance = nums.reduce((acc, n) => acc + (n.val - mean) ** 2, 0) / nums.length;
   const stdDev = Math.sqrt(variance);
 
+  if (stdDev === 0) return [];
   if (!Number.isFinite(stdDev) || stdDev <= Number.EPSILON) return [];
 
   const anomalies: OutlierRow[] = [];
