@@ -10,7 +10,6 @@ import {
 import { AudioRecorder, startSpectrumVisualization, RecordingResult } from './recorder';
 import {
   calculateCountdown,
-  CountdownParts,
   fileToBase64,
   formatDate,
   formatDateTime,
@@ -591,34 +590,48 @@ function renderLockedOverlay(capsule: Capsule): string {
       <p class="locked-subtitle">距离解锁还有</p>
 
       <div class="countdown" id="countdown">
-        ${renderCountdownUnit(cd.days, '天', 3)}
-        ${renderCountdownUnit(cd.hours, '时', 2)}
-        ${renderCountdownUnit(cd.minutes, '分', 2)}
-        ${renderCountdownUnit(cd.seconds, '秒', 2)}
+        ${renderCountdownGroup(cd.days, 'DD', 2)}
+        ${renderColon()}
+        ${renderCountdownGroup(cd.hours, 'HH', 2)}
+        ${renderColon()}
+        ${renderCountdownGroup(cd.minutes, 'MM', 2)}
+        ${renderColon()}
+        ${renderCountdownGroup(cd.seconds, 'SS', 2)}
       </div>
     </div>
   `;
 }
 
-function renderCountdownUnit(value: number, label: string, digits: number): string {
+function renderColon(): string {
+  return `
+    <div class="countdown-separator">
+      <span class="countdown-separator-dot"></span>
+      <span class="countdown-separator-dot"></span>
+    </div>
+  `;
+}
+
+function renderCountdownGroup(value: number, label: string, digits: number): string {
   const str = padZero(value, digits);
   return `
-    <div class="countdown-unit">
-      <div class="countdown-digits">
+    <div class="countdown-unit-wrapper">
+      <div class="countdown-group">
         ${str
           .split('')
-          .map((d, i) => `<div class="flip-digit"><div class="flip-digit-inner" data-digit="${i}">${renderFlipDigit(d)}</div></div>`)
+          .map((d, i) => `<div class="flip-digit" data-digit-index="${label}-${i}">${renderFlipDigit(d)}</div>`)
           .join('')}
       </div>
-      <span class="countdown-label">${label}</span>
+      <div class="countdown-group-label">${label}</div>
     </div>
   `;
 }
 
 function renderFlipDigit(digit: string): string {
   return `
-    <div class="flip-card top"><span>${digit}</span></div>
-    <div class="flip-card bottom"><span>${digit}</span></div>
+    <div class="flip-digit-inner">
+      <div class="flip-half top"><span>${digit}</span></div>
+      <div class="flip-half bottom"><span>${digit}</span></div>
+    </div>
   `;
 }
 
@@ -674,7 +687,9 @@ function startCountdown(capsule: Capsule): void {
   const detailCard = document.getElementById('detail-card') as HTMLDivElement;
   if (!overlay || !countdownEl || !detailCard) return;
 
-  let lastParts: CountdownParts | null = null;
+  const digitKeys = ['DD-0', 'DD-1', 'HH-0', 'HH-1', 'MM-0', 'MM-1', 'SS-0', 'SS-1'];
+  const prevDigits: Record<string, string> = {};
+
   let rafId: number;
   let lastSecond = -1;
 
@@ -695,20 +710,30 @@ function startCountdown(capsule: Capsule): void {
     if (currentSecond !== lastSecond) {
       lastSecond = currentSecond;
 
-      if (!lastParts) {
-        countdownEl.innerHTML = `
-          ${renderCountdownUnit(parts.days, '天', 3)}
-          ${renderCountdownUnit(parts.hours, '时', 2)}
-          ${renderCountdownUnit(parts.minutes, '分', 2)}
-          ${renderCountdownUnit(parts.seconds, '秒', 2)}
-        `;
-      } else {
-        updateDigitIfChanged(parts.days, lastParts.days, 0, 3, countdownEl);
-        updateDigitIfChanged(parts.hours, lastParts.hours, 3, 2, countdownEl);
-        updateDigitIfChanged(parts.minutes, lastParts.minutes, 5, 2, countdownEl);
-        updateDigitIfChanged(parts.seconds, lastParts.seconds, 7, 2, countdownEl);
+      const currentDigits: Record<string, string> = {
+        'DD-0': padZero(parts.days, 2)[0],
+        'DD-1': padZero(parts.days, 2)[1],
+        'HH-0': padZero(parts.hours, 2)[0],
+        'HH-1': padZero(parts.hours, 2)[1],
+        'MM-0': padZero(parts.minutes, 2)[0],
+        'MM-1': padZero(parts.minutes, 2)[1],
+        'SS-0': padZero(parts.seconds, 2)[0],
+        'SS-1': padZero(parts.seconds, 2)[1],
+      };
+
+      for (const key of digitKeys) {
+        const oldDigit = prevDigits[key];
+        const newDigit = currentDigits[key];
+
+        if (oldDigit !== undefined && oldDigit !== newDigit) {
+          const flipDigitEl = countdownEl.querySelector(`[data-digit-index="${key}"]`);
+          if (flipDigitEl) {
+            triggerFlipAnimation(flipDigitEl, oldDigit, newDigit);
+          }
+        }
+
+        prevDigits[key] = newDigit;
       }
-      lastParts = parts;
     }
 
     rafId = requestAnimationFrame(update);
@@ -723,47 +748,48 @@ function startCountdown(capsule: Capsule): void {
   window.addEventListener('hashchange', cleanup);
 }
 
-function updateDigitIfChanged(
-  current: number,
-  last: number,
-  unitIndex: number,
-  digits: number,
-  container: HTMLElement
+function triggerFlipAnimation(
+  flipDigitEl: Element,
+  oldDigit: string,
+  newDigit: string
 ): void {
-  if (current === last) return;
+  const inner = flipDigitEl.querySelector('.flip-digit-inner');
+  if (!inner) return;
 
-  const currentStr = padZero(current, digits);
-  const lastStr = padZero(last, digits);
+  const existingTopFold = inner.querySelector('.flip-top-fold');
+  const existingBottomFold = inner.querySelector('.flip-bottom-fold');
+  if (existingTopFold) existingTopFold.remove();
+  if (existingBottomFold) existingBottomFold.remove();
 
-  for (let i = 0; i < digits; i++) {
-    if (currentStr[i] !== lastStr[i]) {
-      const digitInner = container.querySelectorAll('.flip-digit-inner')[unitIndex + i];
-      if (!digitInner) continue;
+  const staticTop = inner.querySelector('.flip-half.top') as HTMLDivElement;
+  const staticBottom = inner.querySelector('.flip-half.bottom') as HTMLDivElement;
+  if (staticTop) staticTop.querySelector('span')!.textContent = newDigit;
+  if (staticBottom) staticBottom.querySelector('span')!.textContent = oldDigit;
 
-      const top = digitInner.querySelector('.flip-card.top') as HTMLDivElement;
-      const bottom = digitInner.querySelector('.flip-card.bottom') as HTMLDivElement;
-      if (!top || !bottom) continue;
+  const topFold = document.createElement('div');
+  topFold.className = 'flip-top-fold';
+  topFold.innerHTML = `<span>${oldDigit}</span>`;
+  inner.appendChild(topFold);
 
-      top.innerHTML = `<span>${lastStr[i]}</span>`;
-      bottom.innerHTML = `<span>${currentStr[i]}</span>`;
+  const bottomFold = document.createElement('div');
+  bottomFold.className = 'flip-bottom-fold';
+  bottomFold.innerHTML = `<span>${newDigit}</span>`;
+  inner.appendChild(bottomFold);
 
-      top.classList.remove('flipping');
-      bottom.classList.remove('flipping');
-      void top.offsetWidth;
-      void bottom.offsetWidth;
+  void topFold.offsetWidth;
+  void bottomFold.offsetWidth;
 
-      top.classList.add('flipping');
-      bottom.classList.add('flipping');
+  topFold.classList.add('flipping');
+  bottomFold.classList.add('flipping');
 
-      const onAnimEnd = () => {
-        top.innerHTML = `<span>${currentStr[i]}</span>`;
-        top.classList.remove('flipping');
-        bottom.classList.remove('flipping');
-        top.removeEventListener('animationend', onAnimEnd);
-      };
-      top.addEventListener('animationend', onAnimEnd);
-    }
-  }
+  const onDone = () => {
+    staticBottom.querySelector('span')!.textContent = newDigit;
+    topFold.remove();
+    bottomFold.remove();
+    topFold.removeEventListener('animationend', onDone);
+  };
+
+  topFold.addEventListener('animationend', onDone);
 }
 
 // ============ 404 PAGE ============
