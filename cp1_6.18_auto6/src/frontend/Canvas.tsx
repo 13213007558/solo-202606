@@ -47,6 +47,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
   const [selectedStickyId, setSelectedStickyId] = useState<string | null>(null);
   const [compositeBitmap, setCompositeBitmap] = useState<HTMLCanvasElement | null>(null);
   const [cursorPosition, setCursorPosition] = useState<Point>({ x: 0, y: 0 });
+  const [spacePressed, setSpacePressed] = useState(false);
 
   const animFrameRef = useRef<number>();
   const pendingTransformRef = useRef<Transform | null>(null);
@@ -181,7 +182,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
     setCursorPosition(point);
     onCursorUpdate(point.x, point.y);
 
-    if (currentTool === 'pan' || e.button === 1 || (e.button === 0 && e.altKey)) {
+    if (currentTool === 'pan' || spacePressed || e.button === 1 || (e.button === 0 && e.altKey)) {
       setIsPanning(true);
       setPanStart({ x: e.clientX - transform.offsetX, y: e.clientY - transform.offsetY });
       setSelectedStickyId(null);
@@ -338,6 +339,10 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === ' ' && !editingStickyId && !e.repeat) {
+        e.preventDefault();
+        setSpacePressed(true);
+      }
       if (e.key === 'Enter' && selectedStickyId && !editingStickyId) {
         const sticky = elements.find((el) => el.id === selectedStickyId) as StickyElement | undefined;
         if (sticky) {
@@ -371,14 +376,28 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
         }
       }
     };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === ' ') {
+        e.preventDefault();
+        setSpacePressed(false);
+        if (isPanning) {
+          setIsPanning(false);
+          setPanStart(null);
+        }
+      }
+    };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedStickyId, editingStickyId, elements, userId, currentColor]);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [selectedStickyId, editingStickyId, elements, userId, currentColor, isPanning]);
 
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
-    const delta = -e.deltaY * 0.001;
-    const newScale = Math.min(Math.max(transform.scale + delta, 0.1), 5);
+    const delta = -e.deltaY * 0.0015;
+    const newScale = Math.min(Math.max(transform.scale * (1 + delta), 0.25), 4);
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -393,6 +412,20 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
     const newTransform = { scale: newScale, offsetX: newOffsetX, offsetY: newOffsetY };
     pendingTransformRef.current = newTransform;
 
+    if (!animFrameRef.current) {
+      animFrameRef.current = requestAnimationFrame(() => {
+        if (pendingTransformRef.current) {
+          setTransform(pendingTransformRef.current);
+          pendingTransformRef.current = null;
+        }
+        animFrameRef.current = undefined;
+      });
+    }
+  };
+
+  const resetZoom = () => {
+    const newTransform = { scale: 1, offsetX: 0, offsetY: 0 };
+    pendingTransformRef.current = newTransform;
     if (!animFrameRef.current) {
       animFrameRef.current = requestAnimationFrame(() => {
         if (pendingTransformRef.current) {
@@ -776,7 +809,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
   };
 
   const getCursorStyle = (): React.CSSProperties => {
-    if (currentTool === 'pan' || isPanning) {
+    if (currentTool === 'pan' || spacePressed || isPanning) {
       return { cursor: isPanning ? 'grabbing' : 'grab' };
     }
     if (currentTool === 'eraser') {
@@ -786,6 +819,45 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
       return { cursor: 'pointer' };
     }
     return { cursor: 'crosshair' };
+  };
+
+  const renderZoomIndicator = () => {
+    const zoomPercent = Math.round(transform.scale * 100);
+    return (
+      <div
+        onClick={resetZoom}
+        style={{
+          position: 'absolute',
+          bottom: '20px',
+          right: '20px',
+          padding: '8px 16px',
+          backgroundColor: 'rgba(26, 26, 46, 0.9)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid rgba(233, 69, 96, 0.3)',
+          borderRadius: '20px',
+          color: zoomPercent !== 100 ? '#e94560' : '#ffffff',
+          fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+          fontSize: '13px',
+          fontWeight: '500',
+          cursor: 'pointer',
+          userSelect: 'none',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+          zIndex: 100,
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.05)';
+          e.currentTarget.style.boxShadow = '0 6px 16px rgba(233, 69, 96, 0.3)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+        }}
+      >
+        {zoomPercent}%
+      </div>
+    );
   };
 
   return (
@@ -816,6 +888,7 @@ const Canvas = forwardRef<CanvasRef, CanvasProps>(({
       {renderCursors()}
       {renderSelectedHint()}
       {renderEditingSticky()}
+      {renderZoomIndicator()}
     </div>
   );
 });
