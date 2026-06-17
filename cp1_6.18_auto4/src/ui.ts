@@ -56,18 +56,15 @@ export class UIController {
 
     let px: number;
     let arrowPositionClass = '';
-    let arrowLeft: number;
     let arrowTop: number;
 
     if (spaceRight > popupWidth + margin + arrowSize || spaceRight >= spaceLeft) {
       px = Math.min(screenX + margin, window.innerWidth - popupWidth - 4);
       arrowPositionClass = 'arrow-left';
-      arrowLeft = -arrowSize;
       arrowTop = Math.min(Math.max(20, spaceBottom - popupHeight / 2), popupHeight - 30);
     } else {
       px = Math.max(screenX - popupWidth - margin, 4);
       arrowPositionClass = 'arrow-right';
-      arrowLeft = popupWidth;
       arrowTop = Math.min(Math.max(20, spaceBottom - popupHeight / 2), popupHeight - 30);
     }
 
@@ -88,16 +85,13 @@ export class UIController {
     this.popup.style.left = `${px}px`;
     this.popup.style.top = `${py}px`;
 
-    this.popup.classList.remove('visible');
     if (this.fadeTimeout) {
       window.clearTimeout(this.fadeTimeout);
       this.fadeTimeout = null;
     }
-    this.popup.style.opacity = '0';
-    this.popup.style.transform = 'scale(0.92)';
+
+    this.popup.classList.remove('visible');
     void (this.popup.offsetWidth);
-    this.popup.style.opacity = '';
-    this.popup.style.transform = '';
     this.popup.classList.add('visible');
   }
 

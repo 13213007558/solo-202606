@@ -35,8 +35,8 @@
       left: 20px;
       z-index: 100;
       background: rgba(255, 255, 255, 0.14);
-      backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.22);
       border-radius: 16px;
       padding: 20px 24px;
@@ -145,8 +145,8 @@
       inset: 0;
       border-radius: 14px;
       background: rgba(255, 255, 255, 0.16);
-      backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
       border: 1px solid rgba(255, 255, 255, 0.25);
       z-index: -1;
     }
@@ -207,6 +207,21 @@
 
     .fade-transition.fading {
       opacity: 0;
+    }
+
+    @supports not (backdrop-filter: blur(1px)) and not (-webkit-backdrop-filter: blur(1px)) {
+      .control-panel {
+        background: rgba(20, 30, 50, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      .atom-info-popup::before {
+        background: rgba(20, 30, 50, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+      }
+      .atom-info-popup .popup-arrow polygon {
+        fill: rgba(20, 30, 50, 0.9);
+        stroke: rgba(255, 255, 255, 0.18);
+      }
     }
   </style>
 </head>
