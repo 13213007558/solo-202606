@@ -43,8 +43,13 @@ function PaletteCard({ palette, index = 0, showLike = true }: PaletteCardProps) 
     e.stopPropagation();
     if (liked) return;
 
-    setPulsing(true);
-    setTimeout(() => setPulsing(false), 300);
+    setPulsing(false);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setPulsing(true);
+        setTimeout(() => setPulsing(false), 320);
+      });
+    });
 
     try {
       const response = await axios.post(`/api/palettes/${palette.id}/like`);

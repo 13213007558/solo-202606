@@ -83,12 +83,19 @@ function PaletteDetail() {
   const handleLike = async () => {
     if (!palette || liked) return;
 
-    setPulsing(true);
-    setTimeout(() => setPulsing(false), 300);
+    setPulsing(false);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setPulsing(true);
+        setTimeout(() => setPulsing(false), 320);
+      });
+    });
 
     try {
       const response = await axios.post(`/api/palettes/${palette.id}/like`);
-      setLikes(response.data.likes);
+      const updated = response.data;
+      setPalette(updated);
+      setLikes(updated.likes);
       setLiked(true);
     } catch (err) {
       console.error('点赞失败', err);

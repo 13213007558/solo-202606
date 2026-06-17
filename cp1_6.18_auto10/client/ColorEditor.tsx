@@ -1,6 +1,25 @@
 import React, { useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const DEFAULT_COLORS = [
   '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
@@ -27,6 +46,101 @@ const isValidHex = (value: string): boolean => {
   return /^#[0-9A-Fa-f]{6}$/.test(normalizeHex(value));
 };
 
+interface SortableColorItemProps {
+  id: string;
+  color: string;
+  index: number;
+  totalColors: number;
+  fileInputRef: (el: HTMLInputElement | null) => void;
+  onColorPickerClick: (index: number) => void;
+  onColorChange: (index: number, value: string) => void;
+  onHexInput: (index: number, value: string) => void;
+  onHexBlur: (index: number) => void;
+  onRemove: (index: number) => void;
+}
+
+function SortableColorItem({
+  id,
+  color,
+  index,
+  totalColors,
+  fileInputRef,
+  onColorPickerClick,
+  onColorChange,
+  onHexInput,
+  onHexBlur,
+  onRemove,
+}: SortableColorItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+    zIndex: isDragging ? 50 : 'auto',
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`color-picker-item ${isDragging ? 'dragging' : ''}`}
+      {...attributes}
+      {...listeners}
+    >
+      <div className="color-picker-top">
+        <div
+          className="color-swatch"
+          style={{ backgroundColor: isValidHex(color) ? color : '#333' }}
+          onClick={() => onColorPickerClick(index)}
+          title="点击选择颜色，可拖拽排序"
+        >
+          <input
+            type="color"
+            ref={fileInputRef}
+            value={isValidHex(color) ? normalizeHex(color) : '#000000'}
+            onChange={(e) => onColorChange(index, e.target.value)}
+            className="native-color-input"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+        {totalColors > 6 && (
+          <button
+            className="remove-color-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(index);
+            }}
+            title="删除颜色"
+          >
+            ×
+          </button>
+        )}
+      </div>
+      <input
+        type="text"
+        className={`hex-input ${!isValidHex(color) && color.length > 1 ? 'invalid' : ''}`}
+        value={color}
+        onChange={(e) => onHexInput(index, e.target.value)}
+        onBlur={() => onHexBlur(index)}
+        placeholder="#FFFFFF"
+        maxLength={7}
+        onClick={(e) => {
+          e.stopPropagation();
+          (e.target as HTMLInputElement).focus();
+        }}
+      />
+    </div>
+  );
+}
+
 function ColorEditor() {
   const [colors, setColors] = useState<string[]>(DEFAULT_COLORS);
   const [showModal, setShowModal] = useState(false);
@@ -34,10 +148,41 @@ function ColorEditor() {
   const [author, setAuthor] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(String(event.active.id));
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (over && active.id !== over.id) {
+      setColors((items) => {
+        const oldIndex = items.findIndex((_, i) => `color-${i}` === String(active.id));
+        const newIndex = items.findIndex((_, i) => `color-${i}` === String(over.id));
+        if (oldIndex !== -1 && newIndex !== -1) {
+          return arrayMove(items, oldIndex, newIndex);
+        }
+        return items;
+      });
+    }
+  };
 
   const handleColorPickerClick = (index: number) => {
     fileInputRefs.current[index]?.click();
@@ -79,26 +224,6 @@ function ColorEditor() {
     }
   };
 
-  const handleDragStart = (index: number) => {
-    setDragIndex(index);
-  };
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    if (dragIndex === null || dragIndex === index) return;
-
-    const newColors = [...colors];
-    const draggedItem = newColors[dragIndex];
-    newColors.splice(dragIndex, 1);
-    newColors.splice(index, 0, draggedItem);
-    setColors(newColors);
-    setDragIndex(index);
-  };
-
-  const handleDragEnd = () => {
-    setDragIndex(null);
-  };
-
   const openSaveModal = () => {
     setErrors([]);
     setShowModal(true);
@@ -123,12 +248,12 @@ function ColorEditor() {
       validationErrors.push('作者昵称不能为空');
     }
 
-    const normalizedColors = colors.map(c => {
+    const normalizedColors = colors.map((c) => {
       if (isValidHex(c)) return normalizeHex(c);
       return c;
     });
 
-    const invalidColors = normalizedColors.filter(c => !isValidHex(c));
+    const invalidColors = normalizedColors.filter((c) => !isValidHex(c));
     if (invalidColors.length > 0) {
       validationErrors.push(`${invalidColors.length}个颜色格式不正确`);
     }
@@ -145,7 +270,7 @@ function ColorEditor() {
       const response = await axios.post('/api/palettes', {
         name: paletteName.trim(),
         author: author.trim(),
-        colors: normalizedColors
+        colors: normalizedColors,
       });
 
       setShowModal(false);
@@ -163,6 +288,10 @@ function ColorEditor() {
       setSaving(false);
     }
   }, [paletteName, author, colors, navigate]);
+
+  const sortableIds = colors.map((_, index) => `color-${index}`);
+  const activeIndex = activeId ? parseInt(activeId.replace('color-', ''), 10) : -1;
+  const activeColor = activeIndex >= 0 ? colors[activeIndex] : null;
 
   return (
     <div className="editor-page">
@@ -189,53 +318,62 @@ function ColorEditor() {
         </button>
       </div>
 
-      <div className="color-picker-grid">
-        {colors.map((color, index) => (
-          <div
-            key={index}
-            className={`color-picker-item ${dragIndex === index ? 'dragging' : ''}`}
-            draggable
-            onDragStart={() => handleDragStart(index)}
-            onDragOver={(e) => handleDragOver(e, index)}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="color-picker-top">
-              <div
-                className="color-swatch"
-                style={{ backgroundColor: isValidHex(color) ? color : '#333' }}
-                onClick={() => handleColorPickerClick(index)}
-                title="点击选择颜色"
-              >
-                <input
-                  type="color"
-                  ref={(el) => { fileInputRefs.current[index] = el; }}
-                  value={isValidHex(color) ? normalizeHex(color) : '#000000'}
-                  onChange={(e) => handleColorChange(index, e.target.value)}
-                  className="native-color-input"
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={sortableIds} strategy={rectSortingStrategy}>
+          <div className="color-picker-grid">
+            {colors.map((color, index) => (
+              <SortableColorItem
+                key={`color-${index}`}
+                id={`color-${index}`}
+                color={color}
+                index={index}
+                totalColors={colors.length}
+                fileInputRef={(el) => {
+                  fileInputRefs.current[index] = el;
+                }}
+                onColorPickerClick={handleColorPickerClick}
+                onColorChange={handleColorChange}
+                onHexInput={handleHexInput}
+                onHexBlur={handleHexBlur}
+                onRemove={removeColor}
+              />
+            ))}
+          </div>
+        </SortableContext>
+
+        <DragOverlay>
+          {activeId && activeColor !== null ? (
+            <div
+              className="color-picker-item drag-overlay"
+              style={{
+                width: '180px',
+                backgroundColor: 'var(--bg-secondary)',
+                transform: 'rotate(3deg)',
+                boxShadow: 'var(--shadow-lg)',
+              }}
+            >
+              <div className="color-picker-top">
+                <div
+                  className="color-swatch"
+                  style={{
+                    backgroundColor: isValidHex(activeColor)
+                      ? activeColor
+                      : '#333',
+                  }}
                 />
               </div>
-              {colors.length > 6 && (
-                <button
-                  className="remove-color-btn"
-                  onClick={() => removeColor(index)}
-                  title="删除颜色"
-                >
-                  ×
-                </button>
-              )}
+              <div className="hex-input hex-input-readonly">
+                {isValidHex(activeColor) ? activeColor : '???'}
+              </div>
             </div>
-            <input
-              type="text"
-              className={`hex-input ${!isValidHex(color) && color.length > 1 ? 'invalid' : ''}`}
-              value={color}
-              onChange={(e) => handleHexInput(index, e.target.value)}
-              onBlur={() => handleHexBlur(index)}
-              placeholder="#FFFFFF"
-              maxLength={7}
-            />
-          </div>
-        ))}
-      </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
 
       <div className="preview-section">
         <h3 className="preview-title">实时预览</h3>
@@ -246,7 +384,7 @@ function ColorEditor() {
                 key={index}
                 className="preview-color-segment"
                 style={{
-                  backgroundColor: isValidHex(color) ? color : '#333333'
+                  backgroundColor: isValidHex(color) ? color : '#333333',
                 }}
               >
                 <span className="preview-color-label">
@@ -266,7 +404,11 @@ function ColorEditor() {
           >
             <div className="modal-header">
               <h2>保存配色方案</h2>
-              <button className="modal-close" onClick={closeModal} disabled={saving}>
+              <button
+                className="modal-close"
+                onClick={closeModal}
+                disabled={saving}
+              >
                 ×
               </button>
             </div>
@@ -275,7 +417,9 @@ function ColorEditor() {
               {errors.length > 0 && (
                 <div className="error-box">
                   {errors.map((err, i) => (
-                    <p key={i} className="error-text">{err}</p>
+                    <p key={i} className="error-text">
+                      {err}
+                    </p>
                   ))}
                 </div>
               )}
@@ -312,7 +456,9 @@ function ColorEditor() {
                     <div
                       key={i}
                       className="modal-preview-swatch"
-                      style={{ backgroundColor: isValidHex(c) ? c : '#333' }}
+                      style={{
+                        backgroundColor: isValidHex(c) ? c : '#333',
+                      }}
                     />
                   ))}
                 </div>

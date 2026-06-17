@@ -86,7 +86,7 @@ app.post('/api/palettes/:id/like', (req: Request, res: Response) => {
   }
 
   palette.likes += 1;
-  return res.json({ likes: palette.likes });
+  return res.json(palette);
 });
 
 app.listen(PORT, () => {
