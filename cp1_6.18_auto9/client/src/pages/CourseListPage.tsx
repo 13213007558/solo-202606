@@ -19,7 +19,10 @@ const CourseListPage: React.FC = () => {
         courseApi.getAll(),
         statsApi.get(),
       ]);
-      setCourses(coursesData);
+      const sortedCourses = [...coursesData].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      setCourses(sortedCourses);
       setStats(statsData);
     } catch (error) {
       console.error('加载数据失败:', error);

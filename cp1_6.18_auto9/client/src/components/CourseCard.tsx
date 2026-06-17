@@ -32,6 +32,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
     navigate(`/feedback/${course.id}`);
   };
 
+  const isPending = course.feedbackStatus === 'pending';
+
   return (
     <div className="course-card" onClick={handleClick}>
       <h3 className="course-card__name">{course.name}</h3>
@@ -40,7 +42,40 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
         <span
           className={`course-card__status course-card__status--${course.feedbackStatus}`}
         >
-          {course.feedbackStatus === 'pending' ? '未填写' : '已填写'}
+          <svg
+            className="course-card__status-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {isPending ? (
+              <>
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="9"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M12 7v5l3 2"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </>
+            ) : (
+              <path
+                d="M5 13l4 4L19 7"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
+          </svg>
+          {isPending ? '未填写' : '已填写'}
         </span>
       </div>
       <div className="course-card__footer">

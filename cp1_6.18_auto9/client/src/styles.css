@@ -20,6 +20,7 @@
   --star-hover: #f59e0b;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 body {
@@ -130,7 +131,7 @@ body {
 }
 
 .course-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
   border-color: var(--primary-color);
 }
@@ -152,21 +153,29 @@ body {
 }
 
 .course-card__status {
-  display: inline-block;
-  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
 }
 
+.course-card__status-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .course-card__status--pending {
-  background-color: #fef3c7;
-  color: #d97706;
+  background-color: #f3f4f6;
+  color: #6b7280;
 }
 
 .course-card__status--submitted {
-  background-color: #d1fae5;
-  color: #059669;
+  background-color: #dcfce7;
+  color: #16a34a;
 }
 
 .course-card__footer {
