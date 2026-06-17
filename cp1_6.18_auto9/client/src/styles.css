@@ -121,6 +121,7 @@ body {
 }
 
 .course-card {
+  position: relative;
   background: var(--card-bg);
   border-radius: 12px;
   padding: 20px;
@@ -134,6 +135,23 @@ body {
   box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
   border-color: var(--primary-color);
+}
+
+.course-card__dot {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.course-card__dot--pending {
+  background-color: #9ca3af;
+}
+
+.course-card__dot--submitted {
+  background-color: #22c55e;
 }
 
 .course-card__name {
@@ -186,6 +204,30 @@ body {
   border-top: 1px solid var(--border-color);
   font-size: 13px;
   color: var(--text-muted);
+}
+
+.course-card__footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.course-card__submit-time {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.course-card__arrow {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.course-card:hover .course-card__arrow {
+  transform: translateX(3px);
+  color: var(--primary-color);
 }
 
 .feedback-page {
