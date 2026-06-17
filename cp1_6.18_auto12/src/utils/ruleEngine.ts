@@ -115,25 +115,39 @@ const electronicsBase = (days: number): PackingItem[] => {
   ]
 }
 
-const toiletriesBase = (days: number): PackingItem[] => [
-  createItem('牙刷', Math.max(1, Math.ceil(days / 7))),
-  createItem('牙膏', Math.max(1, Math.ceil(days / 14))),
-  createItem('洗面奶', 1),
-  createItem('洗发水/沐浴露', Math.max(1, Math.ceil(days / 7))),
-  createItem('毛巾', Math.max(2, Math.ceil(days / 3))),
-  createItem('护肤品', 1),
-  createItem('剃须刀', Math.max(1, Math.ceil(days / 5)))
-]
+const toiletriesBase = (days: number): PackingItem[] => {
+  const baseQty = (short: number, mid: number, factor: number): number => {
+    if (days <= 3) return short
+    if (days <= 7) return mid
+    return Math.max(mid, Math.ceil(days * factor))
+  }
+  return [
+    createItem('牙刷', baseQty(1, 2, 1 / 5)),
+    createItem('牙膏', baseQty(1, 1, 1 / 10)),
+    createItem('洗面奶', 1),
+    createItem('洗发水/沐浴露', baseQty(1, 1, 1 / 5)),
+    createItem('毛巾', baseQty(1, 2, 1 / 3)),
+    createItem('护肤品', 1),
+    createItem('剃须刀', baseQty(1, 1, 1 / 4))
+  ]
+}
 
-const firstAidBase = (days: number): PackingItem[] => [
-  createItem('创可贴', Math.max(10, days * 2)),
-  createItem('感冒药', Math.max(1, Math.ceil(days / 5))),
-  createItem('肠胃药', Math.max(1, Math.ceil(days / 5))),
-  createItem('退烧药', Math.max(1, Math.ceil(days / 7))),
-  createItem('止痛药', Math.max(1, Math.ceil(days / 5))),
-  createItem('消毒湿巾', Math.max(1, Math.ceil(days / 3))),
-  createItem('口罩', Math.max(5, Math.ceil(days * 1.5)))
-]
+const firstAidBase = (days: number): PackingItem[] => {
+  const baseQty = (short: number, mid: number, factor: number): number => {
+    if (days <= 3) return short
+    if (days <= 7) return mid
+    return Math.max(mid, Math.ceil(days * factor))
+  }
+  return [
+    createItem('创可贴', baseQty(4, 8, 1.5)),
+    createItem('感冒药', baseQty(1, 1, 1 / 5)),
+    createItem('肠胃药', baseQty(1, 1, 1 / 5)),
+    createItem('退烧药', baseQty(1, 1, 1 / 7)),
+    createItem('止痛药', baseQty(1, 1, 1 / 5)),
+    createItem('消毒湿巾', baseQty(1, 2, 1 / 3)),
+    createItem('口罩', baseQty(3, 5, 1.2))
+  ]
+}
 
 const documentsBase = (): PackingItem[] => [
   createItem('身份证/护照', 1),

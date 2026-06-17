@@ -192,7 +192,7 @@ const App: React.FC = () => {
       <main className="app-main">
         <aside className="app-sidebar">
           <LocationForm
-            initialData={formData ?? formDraft}
+            initialData={formDraft}
             onSubmit={handleGenerate}
             onFormChange={handleFormChange}
           />

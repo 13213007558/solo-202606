@@ -72,7 +72,7 @@ const PackingItemRow: React.FC<{
       </span>
       <button
         type="button"
-        className="item-delete ripple"
+        className="item-delete"
         onClick={(e) => {
           e.stopPropagation()
           onDelete()
