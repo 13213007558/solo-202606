@@ -187,6 +187,13 @@ const events: Event[] = [
     creatorName: '绿色志愿者',
     participants: [
       { userId: 'user-1', username: '环保达人', avatar: '🌿', hours: 4 },
+      { userId: 'user-2', username: '绿色志愿者', avatar: '🌱' },
+      { userId: 'user-3', username: '地球卫士', avatar: '🌍' },
+      { userId: 'user-4', username: '小树苗', avatar: '🌳' },
+      { userId: 'user-5', username: '海风轻拂', avatar: '🌊' },
+      { userId: 'user-6', username: '阳光少年', avatar: '☀️' },
+      { userId: 'user-7', username: '山水之间', avatar: '⛰️' },
+      { userId: 'user-8', username: '花园主人', avatar: '🌻' },
     ],
     badges: [
       { name: '循环生活家', icon: '🔄', description: '参与旧物交换活动' },

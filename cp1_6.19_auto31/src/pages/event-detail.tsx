@@ -252,17 +252,31 @@ const EventDetail: React.FC = () => {
             {event.participants.length === 0 ? (
               <p className="empty-participants">暂无参与者</p>
             ) : (
-              <div className="participants-list">
-                {event.participants.map(p => (
-                  <div key={p.userId} className="participant-item">
-                    <span className="participant-avatar">{p.avatar}</span>
-                    <span className="participant-name">{p.username}</span>
-                    {p.hours !== undefined && p.hours > 0 && (
-                      <span className="participant-hours">{p.hours}h</span>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <>
+                <div className="participants-avatars">
+                  {event.participants.slice(0, 5).map(p => (
+                    <span key={p.userId} className="participant-avatar-circle" title={p.username}>
+                      {p.avatar}
+                    </span>
+                  ))}
+                  {event.participants.length > 5 && (
+                    <span className="participant-avatar-circle more">
+                      +{event.participants.length - 5}
+                    </span>
+                  )}
+                </div>
+                <div className="participants-list">
+                  {event.participants.map(p => (
+                    <div key={p.userId} className="participant-item">
+                      <span className="participant-avatar">{p.avatar}</span>
+                      <span className="participant-name">{p.username}</span>
+                      {p.hours !== undefined && p.hours > 0 && (
+                        <span className="participant-hours">{p.hours}h</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -604,6 +618,44 @@ const detailStyles = `
     cursor: not-allowed;
   }
 
+  .participants-avatars {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 4px;
+  }
+
+  .participant-avatar-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-left: -10px;
+    transition: transform 0.2s;
+  }
+
+  .participant-avatar-circle:first-child {
+    margin-left: 0;
+  }
+
+  .participant-avatar-circle:hover {
+    transform: translateY(-2px);
+    z-index: 1;
+  }
+
+  .participant-avatar-circle.more {
+    background: #f0f0f0;
+    color: #666;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
   .participants-list {
     display: flex;
     flex-direction: column;
@@ -862,18 +914,66 @@ const detailStyles = `
   @media (max-width: 768px) {
     .detail-hero {
       height: 200px;
+      border-radius: 12px;
+      margin-bottom: 16px;
     }
 
     .hero-title {
       font-size: 1.25rem;
     }
 
+    .hero-content {
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+    }
+
     .detail-body {
       grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .detail-main {
+      gap: 16px;
+    }
+
+    .detail-section {
+      padding: 16px;
+      border-radius: 12px;
     }
 
     .detail-info-grid {
       grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .detail-sidebar {
+      gap: 16px;
+    }
+
+    .sidebar-card {
+      padding: 16px;
+      border-radius: 12px;
+    }
+
+    .participants-avatars {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .participants-avatars::-webkit-scrollbar {
+      display: none;
+    }
+
+    .participants-avatars .participant-avatar-circle {
+      flex-shrink: 0;
+    }
+
+    .participants-list {
+      max-height: none;
+      overflow: visible;
     }
   }
 `;
