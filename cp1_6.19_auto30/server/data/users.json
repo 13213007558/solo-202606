@@ -1,0 +1,65 @@
+[
+  {
+    "id": "ce734f13-9b94-4eae-bf52-7e4f468877f7",
+    "username": "musician1",
+    "passwordHash": "$2a$10$PnK0jbhhAHkx/yxtidCyd.gvgqeTNXYLIX6dm6XyyzewsGJZhdJvS",
+    "theme": "ocean",
+    "stats": {
+      "totalWorks": 0,
+      "totalLikes": 0,
+      "totalComments": 0,
+      "followers": 0,
+      "weeklyLikes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "1a8f832a-3991-4570-9a27-56ff700c781e",
+    "username": "testmusic",
+    "passwordHash": "$2a$10$g8BK92oh76wIRavgq2yQoOxRf5lso/LOPom4LD8K0qr7b0UE1GLPq",
+    "theme": "ocean",
+    "stats": {
+      "totalWorks": 0,
+      "totalLikes": 0,
+      "totalComments": 0,
+      "followers": 0,
+      "weeklyLikes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "id": "0e54633e-c833-48fd-994a-4c5dbea47798",
+    "username": "newuser1",
+    "passwordHash": "$2a$10$OJ/sfdiD0I8GgENszlRJ2up16O2C/IGTmuCYCzw97f0hSvzg2WYxe",
+    "theme": "ocean",
+    "stats": {
+      "totalWorks": 1,
+      "totalLikes": 1,
+      "totalComments": 0,
+      "followers": 0,
+      "weeklyLikes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  }
+]
