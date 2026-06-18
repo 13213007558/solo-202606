@@ -194,14 +194,16 @@ export default function SkillTreeCanvas({ nodes, onNodeMove, onAddNode }: Props)
               if (!node.parent_id) return null;
               const parent = nodes.find((n) => n.id === node.parent_id);
               if (!parent) return null;
+              const draggingId = dragState?.type === 'node' ? dragState.nodeId : null;
+              const isConnected = draggingId && (node.id === draggingId || parent.id === draggingId);
+              const strokeOpacity = isConnected ? 'rgba(124, 92, 252, 0.9)' : 'rgba(124, 92, 252, 0.6)';
               return (
                 <path
                   key={`edge-${node.id}`}
                   d={getBezierPath(parent.x, parent.y, node.x, node.y)}
-                  stroke="#7C5CFC"
+                  stroke={strokeOpacity}
                   strokeWidth="2"
                   fill="none"
-                  opacity="0.6"
                 />
               );
             })}
