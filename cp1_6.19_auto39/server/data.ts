@@ -594,7 +594,8 @@ export const recipes: Recipe[] = [
 ];
 
 const now = new Date();
-const futureDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+const futureDate3Days = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+const futureDate5Days = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
 const pastStartDate = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
 const pastEndDate = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
 
@@ -605,7 +606,7 @@ export const challenges: Challenge[] = [
     description: '炎热夏天，来一份清爽解腻的甜品吧！',
     rules: '1. 必须为甜品类菜品\n2. 适合夏季食用，口感清爽\n3. 每人限投一篇作品\n4. 由社区点赞评选获胜者',
     startDate: pastStartDate.toISOString(),
-    endDate: futureDate.toISOString(),
+    endDate: futureDate3Days.toISOString(),
     isActive: true,
     participantRecipes: ['recipe-2', 'recipe-7', 'recipe-12', 'recipe-17'],
   },
@@ -615,7 +616,7 @@ export const challenges: Challenge[] = [
     description: '展示你的意面制作技艺，争夺意面之王称号！',
     rules: '1. 必须为意大利面类菜品\n2. 可以是任何风味的意面\n3. 每人限投一篇作品\n4. 由社区点赞评选获胜者',
     startDate: pastStartDate.toISOString(),
-    endDate: futureDate.toISOString(),
+    endDate: futureDate5Days.toISOString(),
     isActive: true,
     participantRecipes: ['recipe-15', 'recipe-20'],
   },

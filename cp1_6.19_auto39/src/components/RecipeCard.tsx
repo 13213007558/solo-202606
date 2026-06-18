@@ -29,7 +29,7 @@ function RecipeCard({ recipe, userId, onLikeChange, style, className = '' }: Rec
     }
 
     setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 600);
+    setTimeout(() => setIsAnimating(false), 300);
 
     try {
       const response = await axios.post(`/api/recipes/${recipe.id}/like`, { userId });

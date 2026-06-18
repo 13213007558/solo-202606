@@ -63,7 +63,10 @@ function Profile({ currentUser }: ProfileProps) {
   const loadUserTrophies = async () => {
     try {
       const response = await axios.get(`/api/users/${id}/trophies`);
-      setTrophies(response.data);
+      const sortedTrophies = [...response.data].sort(
+        (a, b) => new Date(b.awardedAt).getTime() - new Date(a.awardedAt).getTime()
+      );
+      setTrophies(sortedTrophies);
     } catch (error) {
       console.error('加载用户奖杯失败:', error);
     }

@@ -100,7 +100,7 @@ router.post('/:id/participate', (req: Request, res: Response) => {
     r => r.userId === userId && challenge.participantRecipes.includes(r.id)
   );
   if (hasParticipated) {
-    return res.status(400).json({ error: '每人只能投稿一篇菜谱' });
+    return res.status(409).json({ error: '每人只能投稿一篇菜谱，您已参与过该挑战' });
   }
 
   if (challenge.participantRecipes.includes(recipeId)) {
