@@ -1,0 +1,189 @@
+{
+  "users": [
+    [
+      "b988b35e-ec11-4ee1-9df2-37f5d8c084f6",
+      {
+        "id": "b988b35e-ec11-4ee1-9df2-37f5d8c084f6",
+        "username": "alice",
+        "password": "123456",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=alice",
+        "createdAt": "2026-05-19T00:55:19.890Z"
+      }
+    ],
+    [
+      "5e34ee65-3083-4951-a3d0-c3cbd9150ec6",
+      {
+        "id": "5e34ee65-3083-4951-a3d0-c3cbd9150ec6",
+        "username": "bob",
+        "password": "123456",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bob",
+        "createdAt": "2026-05-24T00:55:19.890Z"
+      }
+    ],
+    [
+      "8d31adfd-3c96-4d76-a884-0a404df60077",
+      {
+        "id": "8d31adfd-3c96-4d76-a884-0a404df60077",
+        "username": "carol",
+        "password": "123456",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=carol",
+        "createdAt": "2026-05-29T00:55:19.890Z"
+      }
+    ]
+  ],
+  "tasks": [
+    [
+      "c2a34e71-d036-4ff7-a254-3c08cdb22e68",
+      {
+        "id": "c2a34e71-d036-4ff7-a254-3c08cdb22e68",
+        "title": "设计登录页面 UI",
+        "description": "完成登录和注册页面的视觉设计稿",
+        "status": "done",
+        "priority": "high",
+        "assigneeId": "b988b35e-ec11-4ee1-9df2-37f5d8c084f6",
+        "dueDate": "2026-06-19T00:55:19.890Z",
+        "createdAt": "2026-06-11T00:55:19.890Z",
+        "updatedAt": "2026-06-16T00:55:19.890Z"
+      }
+    ],
+    [
+      "69bf4a17-ce2a-4597-90d4-bb1e7ff6d6d9",
+      {
+        "id": "69bf4a17-ce2a-4597-90d4-bb1e7ff6d6d9",
+        "title": "实现用户认证 API",
+        "description": "使用 JWT 完成注册、登录、token 验证接口",
+        "status": "done",
+        "priority": "urgent",
+        "assigneeId": "5e34ee65-3083-4951-a3d0-c3cbd9150ec6",
+        "dueDate": "2026-06-17T00:55:19.890Z",
+        "createdAt": "2026-06-08T00:55:19.890Z",
+        "updatedAt": "2026-06-15T00:55:19.890Z"
+      }
+    ],
+    [
+      "b157f297-7d65-4888-bd3d-fec8b4b29f8c",
+      {
+        "id": "b157f297-7d65-4888-bd3d-fec8b4b29f8c",
+        "title": "搭建 CI/CD 流水线",
+        "description": "配置 GitHub Actions 自动构建和部署",
+        "status": "in-progress",
+        "priority": "medium",
+        "assigneeId": "8d31adfd-3c96-4d76-a884-0a404df60077",
+        "dueDate": "2026-06-21T00:55:19.890Z",
+        "createdAt": "2026-06-13T00:55:19.890Z",
+        "updatedAt": "2026-06-17T00:55:19.890Z"
+      }
+    ],
+    [
+      "241874a2-edb0-4dcb-8250-7b3ca5cc43a9",
+      {
+        "id": "241874a2-edb0-4dcb-8250-7b3ca5cc43a9",
+        "title": "实现任务拖拽排序",
+        "description": "使用 dnd-kit 实现看板视图的拖拽功能",
+        "status": "in-progress",
+        "priority": "high",
+        "assigneeId": "b988b35e-ec11-4ee1-9df2-37f5d8c084f6",
+        "dueDate": "2026-06-23T00:55:19.890Z",
+        "createdAt": "2026-06-14T00:55:19.890Z",
+        "updatedAt": "2026-06-17T00:55:19.890Z"
+      }
+    ],
+    [
+      "c045765b-64a4-4768-a443-f13131d68235",
+      {
+        "id": "c045765b-64a4-4768-a443-f13131d68235",
+        "title": "添加数据统计仪表盘",
+        "description": "使用 recharts 展示任务完成趋势和成员工作量",
+        "status": "in-review",
+        "priority": "medium",
+        "assigneeId": "5e34ee65-3083-4951-a3d0-c3cbd9150ec6",
+        "dueDate": "2026-06-20T00:55:19.890Z",
+        "createdAt": "2026-06-15T00:55:19.890Z",
+        "updatedAt": "2026-06-18T00:55:19.890Z"
+      }
+    ],
+    [
+      "39c88230-7339-4b69-8b71-6a206fae09fa",
+      {
+        "id": "39c88230-7339-4b69-8b71-6a206fae09fa",
+        "title": "编写单元测试",
+        "description": "为核心业务逻辑编写 Jest 单元测试",
+        "status": "todo",
+        "priority": "low",
+        "assigneeId": "8d31adfd-3c96-4d76-a884-0a404df60077",
+        "dueDate": "2026-06-25T00:55:19.890Z",
+        "createdAt": "2026-06-16T00:55:19.890Z",
+        "updatedAt": "2026-06-16T00:55:19.890Z"
+      }
+    ],
+    [
+      "cab1d89e-17b8-4940-863e-79b4c87f9291",
+      {
+        "id": "cab1d89e-17b8-4940-863e-79b4c87f9291",
+        "title": "优化移动端适配",
+        "description": "修复小屏幕下的布局问题，提升响应式体验",
+        "status": "todo",
+        "priority": "high",
+        "assigneeId": "b988b35e-ec11-4ee1-9df2-37f5d8c084f6",
+        "dueDate": "2026-06-22T00:55:19.890Z",
+        "createdAt": "2026-06-17T00:55:19.890Z",
+        "updatedAt": "2026-06-17T00:55:19.890Z"
+      }
+    ],
+    [
+      "f54872b9-1718-40d6-98cf-53630880b8e8",
+      {
+        "id": "f54872b9-1718-40d6-98cf-53630880b8e8",
+        "title": "配置 ESLint 和 Prettier",
+        "description": "统一代码风格，添加自动格式化钩子",
+        "status": "todo",
+        "priority": "low",
+        "assigneeId": null,
+        "dueDate": "2026-06-28T00:55:19.890Z",
+        "createdAt": "2026-06-18T00:55:19.890Z",
+        "updatedAt": "2026-06-18T00:55:19.890Z"
+      }
+    ]
+  ],
+  "comments": [
+    [
+      "b88bc7d0-97a4-4b1a-bedb-b5ffdc559dd0",
+      {
+        "id": "b6ecfa01-8c47-4b4b-a5bb-0fabc5a0c773",
+        "taskId": "c045765b-64a4-4768-a443-f13131d68235",
+        "userId": "b988b35e-ec11-4ee1-9df2-37f5d8c084f6",
+        "content": "仪表盘的数据源需要和后端对齐，@bob 请确认 API 格式",
+        "mentions": [
+          "5e34ee65-3083-4951-a3d0-c3cbd9150ec6"
+        ],
+        "createdAt": "2026-06-17T00:55:19.890Z"
+      }
+    ],
+    [
+      "9d91db3a-b955-4a39-be60-4dc31177fde5",
+      {
+        "id": "27d07e5d-8078-4301-a1f7-07fa73b4a48c",
+        "taskId": "241874a2-edb0-4dcb-8250-7b3ca5cc43a9",
+        "userId": "5e34ee65-3083-4951-a3d0-c3cbd9150ec6",
+        "content": "拖拽体验很流畅！建议加一个占位符动画",
+        "mentions": [],
+        "createdAt": "2026-06-17T00:55:19.890Z"
+      }
+    ],
+    [
+      "0074b62b-7b18-4401-8523-9be51ab069b3",
+      {
+        "id": "f2f11dc9-f654-4e28-8e2a-26ae57942d78",
+        "taskId": "b157f297-7d65-4888-bd3d-fec8b4b29f8c",
+        "userId": "8d31adfd-3c96-4d76-a884-0a404df60077",
+        "content": "CI 流水线已跑通，等 @alice review 后合并",
+        "mentions": [
+          "b988b35e-ec11-4ee1-9df2-37f5d8c084f6"
+        ],
+        "createdAt": "2026-06-18T00:55:19.890Z"
+      }
+    ]
+  ],
+  "reviews": [],
+  "reviewComments": []
+}
