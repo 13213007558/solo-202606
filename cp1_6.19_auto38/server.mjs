@@ -129,10 +129,28 @@ app.put('/api/exhibitions/:id', (req, res) => {
 app.post('/api/bookings', (req, res) => {
   const db = readDB();
   const { exhibitionId, name, phone, date, count } = req.body;
+  
+  if (!count || count < 1 || count > 3) {
+    return res.status(400).json({ error: '每人限购1-3张票' });
+  }
+  
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: '请输入姓名' });
+  }
+  
+  if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+    return res.status(400).json({ error: '请输入正确的手机号' });
+  }
+  
   const exhibition = db.exhibitions.find(e => e.id === exhibitionId);
   if (!exhibition) {
     return res.status(404).json({ error: '展览不存在' });
   }
+  
+  if (date < exhibition.startDate || date > exhibition.endDate) {
+    return res.status(400).json({ error: '请选择展览期间内的日期' });
+  }
+  
   const booked = getDateBookings(db.bookings, exhibitionId, date);
   if (booked + count > exhibition.capacity) {
     return res.status(400).json({ error: '该日期余票不足' });

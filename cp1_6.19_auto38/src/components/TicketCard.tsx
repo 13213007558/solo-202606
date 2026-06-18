@@ -14,7 +14,7 @@ function formatDate(dateStr: string) {
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
-export default function TicketCard({ booking, exhibitionName, isVisible = true }: TicketCardProps) {
+export default function TicketCard({ booking, exhibitionName, exhibitionImage, isVisible = true }: TicketCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [gradient, setGradient] = useState('linear-gradient(135deg, #D69E2E 0%, #38B2AC 100%)');
   const cardRef = useRef<HTMLDivElement>(null);
@@ -22,39 +22,89 @@ export default function TicketCard({ booking, exhibitionName, isVisible = true }
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = booking.exhibitionImage || '';
+    const imageSrc = exhibitionImage || booking.exhibitionImage || '';
+    img.src = imageSrc;
     img.onload = () => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        canvas.width = 50;
-        canvas.height = 50;
-        ctx.drawImage(img, 0, 0, 50, 50);
+        canvas.width = 100;
+        canvas.height = 100;
+        ctx.drawImage(img, 0, 0, 100, 100);
         try {
-          const imageData = ctx.getImageData(0, 0, 50, 50).data;
-          let r = 0, g = 0, b = 0;
-          let count = 0;
-          for (let i = 0; i < imageData.length; i += 4) {
-            r += imageData[i];
-            g += imageData[i + 1];
-            b += imageData[i + 2];
-            count++;
-          }
-          r = Math.floor(r / count);
-          g = Math.floor(g / count);
-          b = Math.floor(b / count);
+          const imageData = ctx.getImageData(0, 0, 100, 100).data;
+          const colorBuckets: { [key: string]: { r: number; g: number; b: number; count: number; saturation: number } } = {};
           
-          const r2 = Math.min(255, r + 40);
-          const g2 = Math.min(255, g + 60);
-          const b2 = Math.min(255, b + 80);
+          for (let i = 0; i < imageData.length; i += 4) {
+            const r = imageData[i];
+            const g = imageData[i + 1];
+            const b = imageData[i + 2];
+            const a = imageData[i + 3];
+            
+            if (a < 128) continue;
+            
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const saturation = max === 0 ? 0 : ((max - min) / max) * 100;
+            const brightness = (r + g + b) / 3;
+            
+            if (brightness < 30 || brightness > 230) continue;
+            
+            const bucketR = Math.floor(r / 20) * 20;
+            const bucketG = Math.floor(g / 20) * 20;
+            const bucketB = Math.floor(b / 20) * 20;
+            const key = `${bucketR},${bucketG},${bucketB}`;
+            
+            if (!colorBuckets[key]) {
+              colorBuckets[key] = { r: 0, g: 0, b: 0, count: 0, saturation: 0 };
+            }
+            colorBuckets[key].r += r;
+            colorBuckets[key].g += g;
+            colorBuckets[key].b += b;
+            colorBuckets[key].count++;
+            colorBuckets[key].saturation += saturation;
+          }
+          
+          let bestColor = { r: 214, g: 158, b: 46 };
+          let bestScore = -1;
+          
+          for (const key in colorBuckets) {
+            const bucket = colorBuckets[key];
+            const avgR = Math.floor(bucket.r / bucket.count);
+            const avgG = Math.floor(bucket.g / bucket.count);
+            const avgB = Math.floor(bucket.b / bucket.count);
+            const avgSaturation = bucket.saturation / bucket.count;
+            
+            const score = bucket.count * (1 + avgSaturation / 100);
+            
+            if (score > bestScore) {
+              bestScore = score;
+              bestColor = { r: avgR, g: avgG, b: avgB };
+            }
+          }
+          
+          let { r, g, b } = bestColor;
+          const max = Math.max(r, g, b);
+          if (max < 120) {
+            r = Math.min(255, r + 60);
+            g = Math.min(255, g + 60);
+            b = Math.min(255, b + 60);
+          }
+          
+          const r2 = Math.min(255, r + 50);
+          const g2 = Math.min(255, g + 70);
+          const b2 = Math.min(255, b + 90);
           
           setGradient(`linear-gradient(135deg, rgb(${r},${g},${b}) 0%, rgb(${r2},${g2},${b2}) 100%)`);
         } catch (e) {
-          // CORS issue, use default
+          // CORS issue, use default gradient
         }
       }
     };
-  }, [booking.exhibitionImage]);
+    img.onerror = () => {
+      // Image load failed, keep default gradient
+    };
+  }, [exhibitionImage, booking.exhibitionImage]);
 
   useEffect(() => {
     if (isVisible) {

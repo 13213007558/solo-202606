@@ -15,20 +15,34 @@ export default function ExhibitionDetail() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [countdown, setCountdown] = useState(10);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoSlideRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    fetchExhibition();
-    
-    intervalRef.current = setInterval(() => {
+    if (!booking) {
       fetchExhibition();
-    }, 10000);
+      
+      intervalRef.current = setInterval(() => {
+        fetchExhibition();
+      }, 10000);
+    }
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [id]);
+  }, [id, booking]);
+
+  useEffect(() => {
+    if (booking && intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, [booking]);
 
   useEffect(() => {
     if (exhibition?.images && exhibition.images.length > 1) {
@@ -41,10 +55,14 @@ export default function ExhibitionDetail() {
     };
   }, [exhibition?.images?.length]);
 
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const fetchExhibition = async () => {
     try {
       const res = await axios.get(`/api/exhibitions/${id}`);
       setExhibition(res.data);
+      setLastUpdated(new Date());
+      setCountdown(10);
       if (!selectedDate && res.data.dateStats?.length > 0) {
         const today = new Date().toISOString().split('T')[0];
         const available = res.data.dateStats.find((d: DateStat) => 
@@ -61,6 +79,20 @@ export default function ExhibitionDetail() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!booking) {
+      countdownRef.current = setInterval(() => {
+        setCountdown(prev => (prev > 0 ? prev - 1 : 10));
+      }, 1000);
+    }
+    return () => {
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+    };
+  }, [booking]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,12 +175,14 @@ export default function ExhibitionDetail() {
             borderRadius: '8px',
             border: isSelected ? '2px solid var(--accent-amber)' : '2px solid transparent',
             backgroundColor: isSelected ? 'rgba(214, 158, 46, 0.15)' : 'transparent',
-            color: disabled ? 'var(--bg-tertiary)' : 'var(--text-primary)',
+            color: disabled ? 'var(--bg-tertiary)' : isFull ? 'var(--danger)' : 'var(--text-primary)',
             fontSize: '14px',
             position: 'relative',
             cursor: disabled ? 'not-allowed' : 'pointer',
             transition: 'all 0.2s',
             fontWeight: isToday ? 'bold' : 'normal',
+            opacity: disabled ? 0.5 : 1,
+            pointerEvents: disabled ? 'none' : 'auto',
           }}
           onMouseOver={(e) => {
             if (!disabled) {
@@ -168,10 +202,11 @@ export default function ExhibitionDetail() {
               bottom: '4px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '6px',
-              height: '6px',
+              width: '8px',
+              height: '8px',
               borderRadius: '50%',
               backgroundColor: '#F56565',
+              boxShadow: '0 0 4px rgba(245, 101, 101, 0.6)',
             }} />
           )}
           {isToday && (
@@ -179,8 +214,8 @@ export default function ExhibitionDetail() {
               position: 'absolute',
               top: '2px',
               right: '2px',
-              width: '4px',
-              height: '4px',
+              width: '6px',
+              height: '6px',
               borderRadius: '50%',
               backgroundColor: 'var(--accent-teal)',
             }} />
@@ -458,22 +493,60 @@ export default function ExhibitionDetail() {
             padding: '20px',
             marginBottom: '24px',
           }}>
-            <h3 style={{
-              fontSize: '16px',
-              fontWeight: '600',
-              color: 'var(--text-primary)',
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               marginBottom: '12px',
             }}>
-              展览介绍
-            </h3>
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                color: 'var(--text-primary)',
+                margin: 0,
+              }}>
+                展览介绍
+              </h3>
+              {!booking && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '12px',
+                  color: 'var(--text-secondary)',
+                }}>
+                  <div style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: countdown <= 3 ? 'var(--accent-amber)' : 'var(--success)',
+                    animation: 'pulse 1s infinite',
+                  }} />
+                  <span>{countdown}秒后自动刷新</span>
+                  {lastUpdated && (
+                    <span style={{ color: 'var(--accent-teal)' }}>
+                      · 更新于 {lastUpdated.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
             <p style={{
               fontSize: '14px',
               color: 'var(--text-secondary)',
               lineHeight: '1.8',
+              margin: 0,
             }}>
               {exhibition.description}
             </p>
           </div>
+
+          <style>{`
+            @keyframes pulse {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.5; }
+            }
+          `}</style>
 
           {/* 日期选择器 */}
           <div style={{
@@ -750,8 +823,18 @@ export default function ExhibitionDetail() {
                   type="number"
                   min="1"
                   max="3"
+                  step="1"
                   value={formData.count}
                   onChange={(e) => {
+                    const val = Math.min(3, Math.max(1, parseInt(e.target.value) || 1));
+                    setFormData({ ...formData, count: val });
+                  }}
+                  onKeyDown={(e) => {
+                    if (['e', 'E', '+', '-', '.'].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onBlur={(e) => {
                     const val = Math.min(3, Math.max(1, parseInt(e.target.value) || 1));
                     setFormData({ ...formData, count: val });
                   }}
@@ -766,6 +849,7 @@ export default function ExhibitionDetail() {
                     textAlign: 'center',
                     outline: 'none',
                     fontWeight: 'bold',
+                    appearance: 'textfield',
                   }}
                 />
                 <button

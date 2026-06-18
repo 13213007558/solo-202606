@@ -19,7 +19,7 @@
       "name": "印象派大师作品展",
       "startDate": "2026-06-15",
       "endDate": "2026-08-15",
-      "capacity": 80,
+      "capacity": 3,
       "description": "莫奈、雷诺阿、德加...印象派巨匠的真迹首次齐聚本馆。本次展览展出30余幅19世纪印象派代表作品，让您在光影变幻中感受艺术的无限魅力。",
       "coverImage": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800",
       "images": [
@@ -75,10 +75,10 @@
       "name": "李四",
       "phone": "13900139002",
       "date": "2026-07-20",
-      "count": 1,
+      "count": 3,
       "status": "pending",
       "verificationCode": "B3M5P8",
-      "seatNumber": "B08"
+      "seatNumber": "B08, B09, B10"
     },
     {
       "id": "booking-003",
@@ -90,18 +90,6 @@
       "status": "cancelled",
       "verificationCode": "C9R4T6",
       "seatNumber": "C05, C06, C07"
-    },
-    {
-      "id": "booking-0f7b1b00",
-      "exhibitionId": "exh-001",
-      "name": "测试用户",
-      "phone": "13800138000",
-      "date": "2026-07-01",
-      "count": 1,
-      "status": "pending",
-      "verificationCode": "I1E45X",
-      "seatNumber": "E03",
-      "createdAt": "2026-06-18T23:17:13.417Z"
     }
   ],
   "users": [

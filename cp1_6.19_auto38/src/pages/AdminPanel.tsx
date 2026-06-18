@@ -63,10 +63,21 @@ export default function AdminPanel({ user }: AdminPanelProps) {
   };
 
   const getBarColor = (remaining: number, capacity: number) => {
-    const ratio = remaining / capacity;
-    if (ratio > 0.6) return 'linear-gradient(to right, #4299E1, #38B2AC)';
-    if (ratio > 0.3) return 'linear-gradient(to right, #ECC94B, #ED8936)';
-    return 'linear-gradient(to right, #ED8936, #F56565)';
+    const ratio = capacity > 0 ? remaining / capacity : 0;
+    const clampedRatio = Math.max(0, Math.min(1, ratio));
+    
+    const h1 = 210, s1 = 75, l1 = 60;
+    const h2 = 0, s2 = 85, l2 = 65;
+    
+    const h = h1 + (h2 - h1) * (1 - clampedRatio);
+    const s = s1 + (s2 - s1) * (1 - clampedRatio);
+    const l = l1 + (l2 - l1) * (1 - clampedRatio);
+    
+    const lOffset = Math.min(10, l * 0.15);
+    const color1 = `hsl(${h}, ${s}%, ${l}%)`;
+    const color2 = `hsl(${h}, ${s}%, ${Math.min(100, l + lOffset)}%)`;
+    
+    return `linear-gradient(to right, ${color1}, ${color2})`;
   };
 
   if (!user) {

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { Exhibition } from '../types';
 
 interface ExhibitionCardProps {
@@ -36,19 +36,51 @@ function getStatusConfig(status: string) {
 }
 
 function CircularProgress({ value, max }: { value: number; max: number }) {
-  const [displayValue, setDisplayValue] = useState(0);
+  const [displayValue, setDisplayValue] = useState(value);
+  const [animatedProgress, setAnimatedProgress] = useState(max > 0 ? (value / max) * 100 : 0);
+  const animationRef = useRef<number | null>(null);
   const radius = 36;
   const circumference = 2 * Math.PI * radius;
-  const progress = max > 0 ? (value / max) * 100 : 0;
-  const offset = circumference - (progress / 100) * circumference;
+  const targetProgress = max > 0 ? (value / max) * 100 : 0;
+  const offset = circumference - (animatedProgress / 100) * circumference;
   
   useEffect(() => {
-    const timer = setTimeout(() => setDisplayValue(value), 100);
-    return () => clearTimeout(timer);
-  }, [value]);
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+    
+    const duration = 1200;
+    const startTime = performance.now();
+    const startValue = 0;
+    const startProgress = 0;
+    
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const t = Math.min(elapsed / duration, 1);
+      const easeOut = 1 - Math.pow(1 - t, 3);
+      
+      const currentValue = Math.round(startValue + (value - startValue) * easeOut);
+      const currentProgress = startProgress + (targetProgress - startProgress) * easeOut;
+      
+      setDisplayValue(currentValue);
+      setAnimatedProgress(currentProgress);
+      
+      if (t < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    };
+    
+    animationRef.current = requestAnimationFrame(animate);
+    
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [value, targetProgress]);
 
   const getColor = () => {
-    const ratio = value / max;
+    const ratio = max > 0 ? animatedProgress / 100 : 0;
     if (ratio > 0.5) return '#48BB78';
     if (ratio > 0.2) return '#ECC94B';
     return '#F56565';
@@ -82,7 +114,6 @@ function CircularProgress({ value, max }: { value: number; max: number }) {
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          style={{ transition: 'stroke-dashoffset 1s ease-out, stroke 0.3s' }}
         />
       </svg>
       <div style={{
@@ -91,11 +122,13 @@ function CircularProgress({ value, max }: { value: number; max: number }) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        inset: 0,
       }}>
         <span style={{
           fontSize: '18px',
           fontWeight: 'bold',
           color: 'var(--text-primary)',
+          fontVariantNumeric: 'tabular-nums',
         }}>
           {displayValue}
         </span>
