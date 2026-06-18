@@ -80,6 +80,58 @@ router.put('/:id', (req: Request, res: Response) => {
   res.json(books[index]);
 });
 
+router.patch('/:id/status', (req: Request, res: Response) => {
+  const index = books.findIndex(b => b.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Book not found' });
+  }
+
+  const { status, startDate, endDate } = req.body;
+  const validStatuses: ReadingStatus[] = ['unread', 'reading', 'read'];
+
+  if (!status || !validStatuses.includes(status as ReadingStatus)) {
+    return res.status(400).json({ error: 'Invalid status. Must be one of: unread, reading, read' });
+  }
+
+  const newStatus = status as ReadingStatus;
+  const today = new Date().toISOString().split('T')[0];
+
+  let updatedStartDate = startDate;
+  let updatedEndDate = endDate;
+
+  if (newStatus === 'reading' && !books[index].startDate && !updatedStartDate) {
+    updatedStartDate = today;
+  }
+
+  if (newStatus === 'unread') {
+    updatedStartDate = undefined;
+    updatedEndDate = undefined;
+  }
+
+  if (newStatus === 'read') {
+    if (!books[index].startDate && !updatedStartDate) {
+      updatedStartDate = today;
+    } else if (!updatedStartDate) {
+      updatedStartDate = books[index].startDate;
+    }
+    if (!updatedEndDate) {
+      updatedEndDate = today;
+    }
+  }
+
+  books[index] = {
+    ...books[index],
+    status: newStatus,
+    startDate: updatedStartDate !== undefined ? updatedStartDate : (newStatus === 'unread' ? undefined : books[index].startDate),
+    endDate: updatedEndDate !== undefined ? updatedEndDate : (newStatus === 'read' ? updatedEndDate : undefined)
+  };
+
+  res.json({
+    message: 'Status updated successfully',
+    book: books[index]
+  });
+});
+
 router.delete('/:id', (req: Request, res: Response) => {
   const index = books.findIndex(b => b.id === req.params.id);
   if (index === -1) {

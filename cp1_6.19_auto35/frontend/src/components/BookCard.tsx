@@ -14,11 +14,28 @@ const statusLabels: Record<string, string> = {
 };
 
 function BookCard({ book, onUpdate }: BookCardProps) {
-  const [bouncingStar, setBouncingStar] = useState<number | null>(null);
+  const [bouncingStars, setBouncingStars] = useState<Set<number>>(new Set());
+
+  const triggerBounce = (rating: number) => {
+    setBouncingStars(prev => {
+      const next = new Set(prev);
+      next.add(rating);
+      return next;
+    });
+    for (let i = 1; i <= rating; i++) {
+      setTimeout(() => {
+        setBouncingStars(prev => {
+          const next = new Set(prev);
+          next.delete(i);
+          return next;
+        });
+      }, 500 + i * 50);
+    }
+  };
 
   const handleRating = async (rating: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    setBouncingStar(rating);
+    triggerBounce(rating);
     
     try {
       await axios.put(`/api/books/${book.id}`, {
@@ -27,7 +44,6 @@ function BookCard({ book, onUpdate }: BookCardProps) {
         status: 'read'
       });
       
-      setTimeout(() => setBouncingStar(null), 500);
       onUpdate?.();
     } catch (error) {
       console.error('Failed to update rating:', error);
@@ -65,7 +81,7 @@ function BookCard({ book, onUpdate }: BookCardProps) {
           {[1, 2, 3, 4, 5].map((star) => (
             <span
               key={star}
-              className={`star ${book.rating && book.rating >= star ? 'filled' : ''} ${bouncingStar === star ? 'bounce' : ''}`}
+              className={`star ${book.rating && book.rating >= star ? 'filled' : ''} ${bouncingStars.has(star) ? 'bounce' : ''}`}
               onClick={(e) => handleRating(star, e)}
             >
               ★
