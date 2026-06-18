@@ -12,11 +12,59 @@
       "流行"
     ],
     "status": "published",
-    "likes": 1,
-    "likedBy": [
-      "0e54633e-c833-48fd-994a-4c5dbea47798"
+    "likes": 0,
+    "likedBy": [],
+    "comments": [
+      {
+        "id": "a7a10c15-8077-4013-8e54-a5731febb3fc",
+        "userId": "0e54633e-c833-48fd-994a-4c5dbea47798",
+        "username": "guo",
+        "content": "期待更多作品~",
+        "createdAt": "2026-06-18T17:58:27.122Z",
+        "replies": [
+          {
+            "id": "6e32471a-5f7d-4729-9eba-936bb4a4bc06",
+            "userId": "0e54633e-c833-48fd-994a-4c5dbea47798",
+            "username": "guo",
+            "content": "回复 1：说得太对了！",
+            "createdAt": "2026-06-18T18:01:06.268Z",
+            "replies": []
+          },
+          {
+            "id": "0272fa31-14ec-4939-b877-703b810c418f",
+            "userId": "0e54633e-c833-48fd-994a-4c5dbea47798",
+            "username": "guo",
+            "content": "回复 2：说得太对了！",
+            "createdAt": "2026-06-18T18:01:06.275Z",
+            "replies": []
+          },
+          {
+            "id": "78c0d67a-5272-4394-ad5b-5f2c3aee4379",
+            "userId": "0e54633e-c833-48fd-994a-4c5dbea47798",
+            "username": "guo",
+            "content": "回复 3：说得太对了！",
+            "createdAt": "2026-06-18T18:01:06.283Z",
+            "replies": []
+          },
+          {
+            "id": "8d20fe78-95e0-4d8e-b65a-c59f0c7e2f65",
+            "userId": "0e54633e-c833-48fd-994a-4c5dbea47798",
+            "username": "guo",
+            "content": "回复 4：说得太对了！",
+            "createdAt": "2026-06-18T18:01:06.291Z",
+            "replies": []
+          }
+        ]
+      },
+      {
+        "id": "b8560a4e-e4d3-410a-9378-c194acecf9e6",
+        "userId": "0e54633e-c833-48fd-994a-4c5dbea47798",
+        "username": "guo",
+        "content": "这首歌真好听！",
+        "createdAt": "2026-06-18T17:58:26.921Z",
+        "replies": []
+      }
     ],
-    "comments": [],
     "performances": [],
     "createdAt": "2026-06-18T17:05:49.166Z",
     "updatedAt": "2026-06-18T17:10:13.154Z"

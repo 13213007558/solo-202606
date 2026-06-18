@@ -48,8 +48,8 @@
     "theme": "ocean",
     "stats": {
       "totalWorks": 1,
-      "totalLikes": 1,
-      "totalComments": 0,
+      "totalLikes": 0,
+      "totalComments": 2,
       "followers": 0,
       "weeklyLikes": [
         0,

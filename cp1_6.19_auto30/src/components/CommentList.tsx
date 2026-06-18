@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import '../styles/commentList.css';
@@ -21,9 +21,11 @@ interface CommentListProps {
 const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => {
   const { user } = useAuth();
   const [newComment, setNewComment] = useState('');
-  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+  const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -55,25 +57,72 @@ const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => 
     }
   };
 
-  const handleSubmitReply = async (parentId: string) => {
-    if (!user || !replyContent.trim() || submitting) return;
+  const findRootCommentId = (targetCommentId: string): string | null => {
+    for (const comment of comments) {
+      if (comment.id === targetCommentId) return comment.id;
+      if (comment.replies?.some(r => r.id === targetCommentId)) {
+        return comment.id;
+      }
+    }
+    return null;
+  };
+
+  const findCommentUsername = (commentId: string): string => {
+    for (const comment of comments) {
+      if (comment.id === commentId) return comment.username;
+      const reply = comment.replies?.find(r => r.id === commentId);
+      if (reply) return reply.username;
+    }
+    return '';
+  };
+
+  const handleSubmitReply = async () => {
+    if (!user || !replyContent.trim() || submitting || !activeReplyId) return;
     
+    const rootCommentId = findRootCommentId(activeReplyId);
+    if (!rootCommentId) return;
+
+    const replyToUsername = findCommentUsername(activeReplyId);
+    const finalContent = replyToUsername 
+      ? `回复 @${replyToUsername}: ${replyContent.trim()}`
+      : replyContent.trim();
+
     setSubmitting(true);
     try {
       await axios.post(`/api/works/${workId}/comments`, {
         userId: user.id,
         username: user.username,
-        content: replyContent.trim(),
-        parentId,
+        content: finalContent,
+        parentId: rootCommentId,
       });
       setReplyContent('');
-      setReplyTo(null);
+      setActiveReplyId(null);
       onCommentAdded?.();
     } catch (error) {
       console.error('Failed to add reply:', error);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  useEffect(() => {
+    if (activeReplyId && replyTextareaRef.current) {
+      setTimeout(() => {
+        replyTextareaRef.current?.focus();
+      }, 50);
+    }
+  }, [activeReplyId]);
+
+  const toggleRepliesExpand = (commentId: string) => {
+    setExpandedReplies(prev => {
+      const next = new Set(prev);
+      if (next.has(commentId)) {
+        next.delete(commentId);
+      } else {
+        next.add(commentId);
+      }
+      return next;
+    });
   };
 
   const renderComment = (comment: Comment, isReply = false) => (
@@ -86,17 +135,18 @@ const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => 
         </div>
       </div>
       <div className="comment-content">{comment.content}</div>
-      {!isReply && user && (
+      {user && (
         <button 
           className="reply-btn"
-          onClick={() => setReplyTo(replyTo === comment.id ? null : comment.id)}
+          onClick={() => setActiveReplyId(activeReplyId === comment.id ? null : comment.id)}
         >
           回复
         </button>
       )}
-      {replyTo === comment.id && (
+      {activeReplyId === comment.id && (
         <div className="reply-form">
           <textarea
+            ref={replyTextareaRef}
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             placeholder="写下你的回复..."
@@ -105,13 +155,16 @@ const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => 
           <div className="reply-form-actions">
             <button 
               className="btn btn-ghost"
-              onClick={() => setReplyTo(null)}
+              onClick={() => {
+                setActiveReplyId(null);
+                setReplyContent('');
+              }}
             >
               取消
             </button>
             <button 
               className="btn btn-primary"
-              onClick={() => handleSubmitReply(comment.id)}
+              onClick={handleSubmitReply}
               disabled={submitting || !replyContent.trim()}
             >
               {submitting ? '发送中...' : '回复'}
@@ -119,9 +172,22 @@ const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => 
           </div>
         </div>
       )}
-      {comment.replies && comment.replies.length > 0 && (
+      {comment.replies && comment.replies.length > 0 && !isReply && (
         <div className="replies">
-          {comment.replies.map(reply => renderComment(reply, true))}
+          {expandedReplies.has(comment.id) 
+            ? comment.replies.map(reply => renderComment(reply, true))
+            : comment.replies.slice(0, 2).map(reply => renderComment(reply, true))
+          }
+          {comment.replies.length > 2 && (
+            <button 
+              className="view-all-replies-btn"
+              onClick={() => toggleRepliesExpand(comment.id)}
+            >
+              {expandedReplies.has(comment.id) 
+                ? '收起回复' 
+                : `查看全部 ${comment.replies.length} 条回复`}
+            </button>
+          )}
         </div>
       )}
     </div>

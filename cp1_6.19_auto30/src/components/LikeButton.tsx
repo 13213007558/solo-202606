@@ -24,6 +24,7 @@ const LikeButton = ({ workId, initialLikes, initialLiked = false, onLikeChange }
   const [liked, setLiked] = useState(initialLiked);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [pulseAnimating, setPulseAnimating] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const particleIdRef = useRef(0);
 
@@ -31,6 +32,7 @@ const LikeButton = ({ workId, initialLikes, initialLiked = false, onLikeChange }
     if (!user || isAnimating) return;
 
     setIsAnimating(true);
+    setPulseAnimating(true);
     
     const newLiked = !liked;
     const newLikes = newLiked ? likes + 1 : likes - 1;
@@ -42,6 +44,10 @@ const LikeButton = ({ workId, initialLikes, initialLiked = false, onLikeChange }
     if (newLiked) {
       createParticles();
     }
+
+    setTimeout(() => {
+      setPulseAnimating(false);
+    }, 300);
 
     try {
       await axios.post(`/api/works/${workId}/like`, {
@@ -87,7 +93,7 @@ const LikeButton = ({ workId, initialLikes, initialLiked = false, onLikeChange }
         onClick={handleClick}
         disabled={!user}
       >
-        <span className="heart-icon">
+        <span className={`heart-icon ${pulseAnimating ? 'pulse' : ''}`}>
           {liked ? '❤️' : '🤍'}
         </span>
         <span className="like-count">{likes}</span>
