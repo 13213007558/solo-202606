@@ -11,7 +11,6 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({ nodes, onLogSubmit }) => 
   const [duration, setDuration] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
   const formatDuration = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
@@ -43,8 +42,6 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({ nodes, onLogSubmit }) => 
       setSelectedNodes([]);
       setDuration("");
       setNotes("");
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
       console.error("提交日志失败:", error);
     } finally {

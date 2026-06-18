@@ -288,3 +288,106 @@ const SkillTreeCanvas: React.FC<SkillTreeCanvasProps> = ({
     });
   };
   const handleReset=()=>{setScale(1);setTranslate({x:0,y:0});};
+
+
+  return (
+    <div
+      ref={canvasRef}
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100vh",
+        backgroundColor: "#1A1B2F",
+        overflow: "hidden",
+        cursor: isPanning ? "grabbing" : "grab",
+        userSelect: "none",
+      }}
+      onWheel={handleWheel}
+      onMouseDown={handleCanvasMouseDown}
+      onMouseMove={(e) => { handleCanvasMouseMove(e); handleNodeMouseMove(e); }}
+      onMouseUp={() => { handleCanvasMouseUp(); handleNodeMouseUp(); }}
+      onMouseLeave={() => { handleCanvasMouseUp(); handleNodeMouseUp(); }}
+      onDoubleClick={handleDoubleClick}
+    >
+      <div style={{position: "absolute", top: 16, left: 16, padding: "12px 16px", backgroundColor: "rgba(37,42,74,0.9)", border: "1px solid rgba(124,92,252,0.3)", borderRadius: 12, fontSize: 13, color: "#A0A4C4", lineHeight: 1.8, zIndex: 10, boxShadow: "0 0 20px rgba(124,92,252,0.1)"}}>
+        <div style={{color: "#7C5CFC", fontWeight: 600, marginBottom: 4}}>操作提示</div>
+        <div>滚轮缩放画布</div>
+        <div>拖拽空白处平移</div>
+        <div>拖拽节点移动位置</div>
+        <div>双击空白处添加节点</div>
+      </div>
+      <div style={{position: "absolute", bottom: 24, right: 24, display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", backgroundColor: "rgba(37,42,74,0.9)", border: "1px solid rgba(124,92,252,0.3)", borderRadius: 12, zIndex: 10, boxShadow: "0 0 20px rgba(124,92,252,0.1)"}}>
+        <button onClick={handleZoomOut} style={{width: 32, height: 32, borderRadius: 8, backgroundColor: "rgba(124,92,252,0.2)", color: "#7C5CFC", fontSize: 18, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer"}}>-</button>
+        <span style={{minWidth: 50, textAlign: "center", color: "#FFFFFF", fontSize: 14, fontWeight: 500}}>{Math.round(scale * 100)}%</span>
+        <button onClick={handleZoomIn} style={{width: 32, height: 32, borderRadius: 8, backgroundColor: "rgba(124,92,252,0.2)", color: "#7C5CFC", fontSize: 18, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer"}}>+</button>
+        <button onClick={handleReset} style={{height: 32, padding: "0 12px", borderRadius: 8, backgroundColor: "rgba(124,92,252,0.2)", color: "#7C5CFC", fontSize: 13, fontWeight: 500, marginLeft: 4, border: "none", cursor: "pointer"}}>重置</button>
+      </div>
+      <svg style={{position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none"}}>
+        <g transform={`translate(${translate.x}, ${translate.y}) scale(${scale})`}>
+          {renderGrid()}
+          {renderConnections()}
+        </g>
+      </svg>
+      <div style={{position: "absolute", top: 0, left: 0, transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})`, transformOrigin: "0 0"}}>
+        {nodes.map((node) => (
+          <div
+            key={node.id}
+            className="skill-node-card"
+            style={{
+              position: "absolute",
+              left: node.x,
+              top: node.y,
+              width: NODE_WIDTH,
+              height: NODE_HEIGHT,
+              padding: "16px",
+              backgroundColor: "#252A4A",
+              border: `2px solid ${draggingNode === node.id ? "rgba(155,130,255,0.8)" : "rgba(124,92,252,0.5)"}`,
+              borderRadius: 16,
+              boxShadow: draggingNode === node.id ? "0 0 30px rgba(124,92,252,0.5), inset 0 0 20px rgba(124,92,252,0.1)" : "0 0 20px rgba(124,92,252,0.15)",
+              cursor: draggingNode === node.id ? "grabbing" : "grab",
+              transition: draggingNode === node.id ? "none" : "box-shadow 0.3s, border-color 0.3s",
+              boxSizing: "border-box",
+            }}
+            onMouseDown={(e) => handleNodeMouseDown(e, node.id, node.x, node.y)}
+          >
+            <div style={{color: "#FFFFFF", fontSize: 15, fontWeight: 600, marginBottom: 6, paddingRight: 44, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
+              {node.title}
+            </div>
+            <div style={{color: "#A0A4C4", fontSize: 12, lineHeight: 1.5, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical"}}>
+              {node.description}
+            </div>
+            {renderProgressRing(node.progress)}
+          </div>
+        ))}
+      </div>
+      {showAddModal && (
+        <div style={{position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100}} onClick={() => setShowAddModal(false)}>
+          <div style={{backgroundColor: "#252A4A", border: "1px solid rgba(124,92,252,0.4)", borderRadius: 16, padding: 28, minWidth: 400, boxShadow: "0 0 40px rgba(124,92,252,0.3)"}} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{color: "#FFFFFF", fontSize: 18, fontWeight: 600, margin: 0, marginBottom: 20}}>添加新技能节点</h3>
+            <div style={{marginBottom: 16}}>
+              <label style={{display: "block", color: "#A0A4C4", fontSize: 13, marginBottom: 6}}>节点标题</label>
+              <input type="text" value={newNodeTitle} onChange={(e) => setNewNodeTitle(e.target.value)} placeholder="输入技能名称" style={{width: "100%", padding: "10px 14px", backgroundColor: "#1A1B2F", border: "1px solid rgba(124,92,252,0.3)", borderRadius: 8, color: "#FFFFFF", fontSize: 14, outline: "none", boxSizing: "border-box"}} />
+            </div>
+            <div style={{marginBottom: 16}}>
+              <label style={{display: "block", color: "#A0A4C4", fontSize: 13, marginBottom: 6}}>节点描述</label>
+              <textarea value={newNodeDesc} onChange={(e) => setNewNodeDesc(e.target.value)} placeholder="输入技能描述" rows={3} style={{width: "100%", padding: "10px 14px", backgroundColor: "#1A1B2F", border: "1px solid rgba(124,92,252,0.3)", borderRadius: 8, color: "#FFFFFF", fontSize: 14, outline: "none", boxSizing: "border-box", resize: "none", fontFamily: "inherit"}} />
+            </div>
+            <div style={{marginBottom: 24}}>
+              <label style={{display: "block", color: "#A0A4C4", fontSize: 13, marginBottom: 6}}>父节点 (可选)</label>
+              <select value={newNodeParentId || ""} onChange={(e) => setNewNodeParentId(e.target.value || null)} style={{width: "100%", padding: "10px 14px", backgroundColor: "#1A1B2F", border: "1px solid rgba(124,92,252,0.3)", borderRadius: 8, color: "#FFFFFF", fontSize: 14, outline: "none", boxSizing: "border-box"}}>
+                <option value="">无父节点 (根节点)</option>
+                {nodes.map((n) => (<option key={n.id} value={n.id}>{n.title}</option>))}
+              </select>
+            </div>
+            <div style={{display: "flex", gap: 12, justifyContent: "flex-end"}}>
+              <button onClick={() => setShowAddModal(false)} style={{padding: "10px 24px", borderRadius: 10, backgroundColor: "rgba(160,164,196,0.1)", color: "#A0A4C4", fontSize: 14, fontWeight: 500, border: "none", cursor: "pointer"}}>取消</button>
+              <button onClick={handleAddNode} style={{padding: "10px 24px", borderRadius: 10, backgroundColor: "#7C5CFC", color: "#FFFFFF", fontSize: 14, fontWeight: 600, border: "none", cursor: "pointer", boxShadow: "0 0 20px rgba(124,92,252,0.3)"}}>添加</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SkillTreeCanvas;
