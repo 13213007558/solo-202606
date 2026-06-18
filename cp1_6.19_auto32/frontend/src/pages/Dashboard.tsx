@@ -161,8 +161,28 @@ function Dashboard() {
     gradient: string
   ) => {
     const change = prev > 0 ? ((value - prev) / prev) * 100 : 0;
-    const isUp = change > 0;
+    const isFlat = Math.abs(change) < 1;
+    const isUp = change > 0 && !isFlat;
+    const isDown = change < 0 && !isFlat;
     const progressPct = Math.min((value / (prev * 1.5)) * 100, 100);
+
+    let arrowIcon = '—';
+    let arrowColor = '#a0aec0';
+    let textColor = '#a0aec0';
+    let progressBg = 'linear-gradient(90deg, #718096, #a0aec0)';
+
+    if (isUp) {
+      arrowIcon = '↑';
+      arrowColor = '#48bb78';
+      textColor = '#48bb78';
+      progressBg = 'linear-gradient(90deg, #ed8936, #f6ad55)';
+    } else if (isDown) {
+      arrowIcon = '↓';
+      arrowColor = '#fc8181';
+      textColor = '#fc8181';
+      progressBg = 'linear-gradient(90deg, #00d4ff, #68e1ff)';
+    }
+
     return (
       <div style={overviewCardStyle}>
         <div
@@ -178,14 +198,29 @@ function Dashboard() {
           }}
         />
         <div style={{ fontSize: 13, color: '#a0aec0', marginBottom: 8 }}>{label}</div>
-        <div style={{ fontSize: 32, fontWeight: 800, color: '#f7fafc', lineHeight: 1.2 }}>
-          {value.toFixed(1)}
-          <span style={{ fontSize: 14, fontWeight: 400, color: '#a0aec0', marginLeft: 4 }}>
-            {unit}
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <div style={{ fontSize: 32, fontWeight: 800, color: '#f7fafc', lineHeight: 1.2 }}>
+            {value.toFixed(1)}
+            <span style={{ fontSize: 14, fontWeight: 400, color: '#a0aec0', marginLeft: 4 }}>
+              {unit}
+            </span>
+          </div>
+          <span
+            style={{
+              position: 'absolute',
+              top: -2,
+              right: -28,
+              fontSize: 20,
+              fontWeight: 800,
+              color: arrowColor,
+              lineHeight: 1,
+            }}
+          >
+            {arrowIcon}
           </span>
         </div>
-        <div style={{ fontSize: 12, color: isUp ? '#fc8181' : '#48bb78', marginTop: 6 }}>
-          {isUp ? '↑' : '↓'} {Math.abs(change).toFixed(1)}% 较上周期
+        <div style={{ fontSize: 12, color: textColor, marginTop: 6 }}>
+          {arrowIcon} {Math.abs(change).toFixed(1)}% 较上周期
         </div>
         <div
           style={{
@@ -200,11 +235,9 @@ function Dashboard() {
             style={{
               height: '100%',
               borderRadius: 2,
-              background: isUp
-                ? 'linear-gradient(90deg, #ed8936, #fc8181)'
-                : 'linear-gradient(90deg, #48bb78, #68d391)',
+              background: progressBg,
               width: `${progressPct}%`,
-              transition: 'width 0.8s ease',
+              transition: 'width 0.8s ease, background 0.4s ease',
             }}
           />
         </div>
