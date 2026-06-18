@@ -210,6 +210,15 @@
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
+@media (hover: none) and (pointer: coarse) {
+  .card-time {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .time-tooltip {
+    animation: tooltipFade 0.18s ease;
+  }
+}
+
 .fav-btn {
   position: relative;
   border: none;
@@ -229,25 +238,25 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: var(--size);
-  height: var(--size);
+  width: var(--size, 6px);
+  height: var(--size, 6px);
   border-radius: 50%;
-  background: var(--color);
+  background: var(--color, #FFD700);
   pointer-events: none;
-  animation: particleOut var(--duration) ease-out forwards;
+  animation: particleOut var(--duration, 1s) ease-out forwards;
   transform-origin: center;
 }
 
 @keyframes particleOut {
   0% {
-    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0);
+    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(0);
     opacity: 1;
   }
   70% {
     opacity: 0.8;
   }
   100% {
-    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(var(--distance) * -1));
+    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(calc(var(--distance, 50px) * -1));
     opacity: 0;
   }
 }

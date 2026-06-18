@@ -42,7 +42,15 @@ const formatAbsoluteTime = (ts: number) => {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 };
 
-const PARTICLE_COLORS = ['#FFD700', '#4F46E5'];
+const lerpColor = (c1: [number, number, number], c2: [number, number, number], t: number): string => {
+  const r = Math.round(c1[0] + (c2[0] - c1[0]) * t);
+  const g = Math.round(c1[1] + (c2[1] - c1[1]) * t);
+  const b = Math.round(c1[2] + (c2[2] - c1[2]) * t);
+  return `rgb(${r}, ${g}, ${b})`;
+};
+
+const GOLD_RGB: [number, number, number] = [255, 215, 0];
+const INDIGO_RGB: [number, number, number] = [79, 70, 229];
 
 interface ParticleData {
   id: number;
@@ -53,12 +61,16 @@ interface ParticleData {
   duration: number;
 }
 
+let particleCounter = 0;
+
 const generateParticles = (count: number = 14): ParticleData[] => {
+  particleCounter += count;
+  const base = particleCounter - count;
   return Array.from({ length: count }, (_, i) => ({
-    id: i,
+    id: base + i,
     angle: Math.random() * 360,
     distance: 24 + Math.random() * 28,
-    color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
+    color: lerpColor(GOLD_RGB, INDIGO_RGB, Math.random()),
     size: 2 + Math.random() * 4,
     duration: 0.5 + Math.random() * 0.4,
   }));
@@ -88,6 +100,7 @@ const IdeaCard = ({ card, searchKeyword, onToggleFavorite, index, animationKey }
   const [liveWave, setLiveWave] = useState<number[]>(card.audioWaveform || new Array(40).fill(0.2));
   const audioElRef = useRef<HTMLAudioElement>(null);
   const animRef = useRef<number>(0);
+  const particleTimerRef = useRef<number>(0);
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 60000);
@@ -97,18 +110,31 @@ const IdeaCard = ({ card, searchKeyword, onToggleFavorite, index, animationKey }
   useEffect(() => {
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current);
+      if (particleTimerRef.current) clearTimeout(particleTimerRef.current);
     };
   }, []);
 
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!card.favorite) {
-      setParticles(generateParticles());
-      setShowParticles(true);
-      setTimeout(() => setShowParticles(false), 900);
+      if (particleTimerRef.current) clearTimeout(particleTimerRef.current);
+      setShowParticles(false);
+      requestAnimationFrame(() => {
+        setParticles(generateParticles());
+        setShowParticles(true);
+        particleTimerRef.current = window.setTimeout(() => setShowParticles(false), 900);
+      });
     }
     onToggleFavorite(card.id);
   };
+
+  const handleTimeTouch = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    setShowTooltip((prev) => !prev);
+  };
+
+  const handleTimeMouseEnter = () => setShowTooltip(true);
+  const handleTimeMouseLeave = () => setShowTooltip(false);
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -232,11 +258,12 @@ const IdeaCard = ({ card, searchKeyword, onToggleFavorite, index, animationKey }
       key={animationKey}
     >
       {renderContent()}
-      <div className="card-footer">
+      <div className="card-footer" onClick={() => showTooltip && setShowTooltip(false)}>
         <span
           className="card-time"
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
+          onMouseEnter={handleTimeMouseEnter}
+          onMouseLeave={handleTimeMouseLeave}
+          onTouchStart={handleTimeTouch}
         >
           {formatRelativeTime(card.createdAt, now)}
           {showTooltip && (
