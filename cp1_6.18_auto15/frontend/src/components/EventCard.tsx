@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EventCardData } from '@/types';
 import { getDaysRemaining, isUrgentEvent } from '@/utils/helpers';
-import './EventCard.css';
 
 interface EventCardProps {
   event: EventCardData;
@@ -73,7 +72,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
               <span className="event-card__member-count">{event.memberCount}人参与</span>
             </div>
 
-            <div className={`event-card__days ${isUrgent ? 'urgent' : ''}`}>
+            <div className={`event-card__days ${isUrgent ? 'event-card__days--urgent' : ''}`}>
               <span className="event-card__days-number">{daysRemaining}</span>
               <span className="event-card__days-label">天后</span>
             </div>
