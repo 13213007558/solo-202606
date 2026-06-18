@@ -179,7 +179,7 @@ export default function Dashboard() {
 
       <div className={`stats-panel ${streakGlow ? 'streak-glow' : ''}`}>
         <div className="card stat-card">
-          <span className="stat-icon">🔥</span>
+          <span className={`stat-icon ${stats.streak > 0 ? 'fire-breath' : ''}`}>🔥</span>
           <div className="stat-content">
             <span className="stat-value">{stats.streak}</span>
             <span className="stat-label">连续打卡天数</span>

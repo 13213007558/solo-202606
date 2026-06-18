@@ -51,6 +51,18 @@ body {
   to { stroke-dashoffset: var(--ring-offset); }
 }
 
+@keyframes fireBreath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes checkmarkFade {
+  0% { opacity: 0; transform: scale(0.5); }
+  30% { opacity: 1; transform: scale(1.1); }
+  70% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.8); }
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -262,6 +274,12 @@ body {
 .stat-icon {
   font-size: 28px;
   flex-shrink: 0;
+  display: inline-block;
+}
+
+.stat-icon.fire-breath {
+  animation: fireBreath 2s ease-in-out infinite;
+  transform-origin: center;
 }
 
 .stat-content {
@@ -357,7 +375,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, opacity 0.15s, filter 0.15s;
 }
 
 .tree-node:hover {
@@ -367,7 +385,9 @@ body {
 .tree-node.dragging {
   cursor: grabbing;
   z-index: 10;
+  opacity: 0.85;
   box-shadow: inset 0 0 16px rgba(124, 92, 252, 0.35), 0 4px 24px rgba(0, 0, 0, 0.4);
+  filter: drop-shadow(0 8px 24px rgba(124, 92, 252, 0.4));
 }
 
 .tree-node-title {
@@ -490,6 +510,25 @@ body {
   padding: 6px 10px;
   font-size: 12px;
   max-width: 120px;
+}
+
+.log-submit-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.log-submit-wrapper .btn {
+  flex: 1;
+}
+
+.log-checkmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4ade80;
+  font-size: 24px;
+  animation: checkmarkFade 1s ease-out forwards;
 }
 
 @media (max-width: 768px) {

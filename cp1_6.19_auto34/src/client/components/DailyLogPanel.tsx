@@ -17,6 +17,8 @@ export default function DailyLogPanel({ nodes, onSubmit }: Props) {
   const [duration, setDuration] = useState('');
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [checkmarkKey, setCheckmarkKey] = useState(0);
+  const [showCheckmark, setShowCheckmark] = useState(false);
 
   const toggleNode = (id: string) => {
     setSelectedNodes((prev) => {
@@ -37,7 +39,10 @@ export default function DailyLogPanel({ nodes, onSubmit }: Props) {
     setDuration('');
     setNotes('');
     setSubmitted(true);
+    setShowCheckmark(true);
+    setCheckmarkKey((prev) => prev + 1);
     setTimeout(() => setSubmitted(false), 2000);
+    setTimeout(() => setShowCheckmark(false), 1000);
   };
 
   return (
@@ -97,14 +102,21 @@ export default function DailyLogPanel({ nodes, onSubmit }: Props) {
           />
         </div>
 
-        <button
-          className="btn btn-primary"
-          type="submit"
-          disabled={selectedNodes.size === 0 || !duration}
-          style={{ width: '100%', opacity: selectedNodes.size === 0 || !duration ? 0.5 : 1 }}
-        >
-          {submitted ? '✅ 打卡成功！' : '📝 打卡'}
-        </button>
+        <div className="log-submit-wrapper">
+          <button
+            className="btn btn-primary"
+            type="submit"
+            disabled={selectedNodes.size === 0 || !duration}
+            style={{ opacity: selectedNodes.size === 0 || !duration ? 0.5 : 1 }}
+          >
+            {submitted ? '✅ 打卡成功！' : '📝 打卡'}
+          </button>
+          {showCheckmark && (
+            <span key={checkmarkKey} className="log-checkmark" role="img" aria-label="success">
+              ✅
+            </span>
+          )}
+        </div>
       </form>
     </div>
   );
