@@ -1,0 +1,17 @@
+
+  hideExhibitCard() {
+    if (!this.exhibitCard) return
+    this.exhibitCard.style.opacity = "0"
+    this.exhibitCard.style.transform = "translate(-50%,-50%) scale(0.8)"
+    this.exhibitCard.style.pointerEvents = "none"
+  }
+
+  updateVisitorCount(count: number) {
+    const el = document.getElementById("visitor-count")
+    if (el) el.textContent = String(count)
+  }
+
+  updateExhibitCount(count: number) {
+    const el = document.getElementById("exhibit-count")
+    if (el) el.textContent = String(count)
+  }

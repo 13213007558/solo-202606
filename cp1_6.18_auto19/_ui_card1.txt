@@ -1,0 +1,12 @@
+
+  private createExhibitCard() {
+    const card = document.createElement("div")
+    card.style.cssText = "position:fixed;top:50%;left:50%;" +
+      "transform:translate(-50%,-50%) scale(0.8);" +
+      "width:90%;max-width:500px;padding:24px;border-radius:16px;" +
+      "background:rgba(255,255,255,0.1);" +
+      "backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);" +
+      "border:1px solid rgba(255,255,255,0.2);color:white;z-index:200;" +
+      "opacity:0;pointer-events:none;" +
+      "transition:all 0.4s cubic-bezier(0.16,1,0.3,1);" +
+      "box-shadow:0 25px 50px rgba(0,0,0,0.3);"

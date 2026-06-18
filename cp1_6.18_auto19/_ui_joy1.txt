@@ -1,0 +1,17 @@
+
+  private createJoystick() {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    if (!isMobile) return
+    const base = document.createElement("div")
+    base.style.cssText = "position:fixed;bottom:40px;left:40px;width:120px;" +
+      "height:120px;border-radius:50%;background:rgba(255,255,255,0.15);" +
+      "backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);" +
+      "border:2px solid rgba(255,255,255,0.3);z-index:150;touch-action:none;"
+    const knob = document.createElement("div")
+    knob.style.cssText = "position:absolute;top:50%;left:50%;width:50px;" +
+      "height:50px;border-radius:50%;background:rgba(255,255,255,0.6);" +
+      "transform:translate(-50%,-50%);transition:transform 0.1s;"
+    base.appendChild(knob)
+    document.body.appendChild(base)
+    this.joystick = base
+    this.joystickKnob = knob

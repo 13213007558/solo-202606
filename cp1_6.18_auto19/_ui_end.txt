@@ -1,0 +1,15 @@
+
+  startBreathing() {
+    let time = 0
+    const animate = () => {
+      time += 0.02
+      if (this.infoPanel) {
+        const glow = 0.3 + Math.sin(time) * 0.2
+        this.infoPanel.style.boxShadow =
+          "0 0 " + (20 + Math.sin(time) * 10) + "px rgba(255,200,150," + glow + ")"
+      }
+      requestAnimationFrame(animate)
+    }
+    animate()
+  }
+}
