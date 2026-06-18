@@ -1,0 +1,14 @@
+{
+  "name": "reading-shelf-challenge",
+  "version": "1.0.0",
+  "description": "Personal reading shelf and reading challenge application",
+  "scripts": {
+    "dev": "concurrently \"cd backend && npm start\" \"cd frontend && npm run dev\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
