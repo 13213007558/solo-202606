@@ -1,0 +1,16 @@
+[
+  {
+    "id": "72482932-3213-4621-94f5-c8c915f32b9c",
+    "username": "testuser",
+    "passwordHash": "56760663",
+    "theme": "dawn-orange",
+    "stats": {
+      "totalWorks": 0,
+      "totalLikes": 0,
+      "totalComments": 0,
+      "followers": 8,
+      "dailyLikes": []
+    },
+    "createdAt": "2026-06-18T15:15:13.368Z"
+  }
+]
