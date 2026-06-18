@@ -14,5 +14,22 @@
     "likes": 1,
     "createdAt": "2026-06-18T15:17:04.647Z",
     "updatedAt": "2026-06-18T15:17:04.647Z"
+  },
+  {
+    "id": "5caa75ba-0ae8-4fb0-9a8e-8d68a15f558e",
+    "userId": "f4d66c6a-7180-4e34-8e26-ce6aa008d0ad",
+    "title": "测试歌曲",
+    "lyricist": "测试作词",
+    "composer": "测试作曲",
+    "lyrics": "这是歌词\n第二行歌词",
+    "audioUrl": "",
+    "tags": [
+      "流行",
+      "摇滚"
+    ],
+    "status": "published",
+    "likes": 1,
+    "createdAt": "2026-06-18T15:26:14.224Z",
+    "updatedAt": "2026-06-18T15:26:14.224Z"
   }
 ]

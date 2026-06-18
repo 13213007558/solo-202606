@@ -12,5 +12,33 @@
       "dailyLikes": []
     },
     "createdAt": "2026-06-18T15:15:13.368Z"
+  },
+  {
+    "id": "27a7a27e-cc1c-4c19-b7da-d19099b0a203",
+    "username": "apitest",
+    "passwordHash": "56760663",
+    "theme": "night-purple",
+    "stats": {
+      "totalWorks": 0,
+      "totalLikes": 0,
+      "totalComments": 0,
+      "followers": 12,
+      "dailyLikes": []
+    },
+    "createdAt": "2026-06-18T15:25:11.908Z"
+  },
+  {
+    "id": "f4d66c6a-7180-4e34-8e26-ce6aa008d0ad",
+    "username": "apitest2",
+    "passwordHash": "56760663",
+    "theme": "ocean-blue",
+    "stats": {
+      "totalWorks": 0,
+      "totalLikes": 0,
+      "totalComments": 0,
+      "followers": 2,
+      "dailyLikes": []
+    },
+    "createdAt": "2026-06-18T15:25:17.137Z"
   }
 ]
