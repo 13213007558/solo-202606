@@ -1,0 +1,15 @@
+[
+  {
+    "id": "a0e61d5d-9d88-4c5f-b340-b6dd644caace",
+    "name": "个人博客系统",
+    "description": "基于 React + Node.js 的个人博客系统，支持 Markdown 文章编写、评论、标签分类等功能",
+    "techStack": [
+      "React",
+      "Node.js",
+      "TypeScript"
+    ],
+    "githubUrl": "https://github.com/testuser/personal-blog",
+    "status": "development",
+    "createdAt": "2026-06-18T23:22:52.275Z"
+  }
+]
