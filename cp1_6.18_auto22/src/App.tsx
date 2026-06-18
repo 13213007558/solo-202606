@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import AuctionCard from './components/AuctionCard';
-import LoginForm from './components/LoginForm';
-import CreateItem from './components/CreateItem';
-import AuctionDetail from './components/AuctionDetail';
+import AuctionCard from './modules/auction/auctionCard';
+import LoginForm from './modules/user/loginForm';
+import CreateItem from './modules/user/createItem';
+import AuctionDetail from './modules/auction/auctionDetail';
 
 interface User {
   id: string;

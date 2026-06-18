@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../App';
 
 const CreateItem: React.FC = () => {
   const { user } = useAuth();
@@ -56,7 +56,7 @@ const CreateItem: React.FC = () => {
 
   if (!user) {
     return (
-      <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>
+      <div style={{ textAlign: 'center', padding: 60, color: '#CBD5E0' }}>
         请先登录后再创建拍卖品
       </div>
     );
@@ -65,61 +65,61 @@ const CreateItem: React.FC = () => {
   const inputStyle = {
     width: '100%' as const,
     padding: '10px 12px',
-    background: 'var(--bg-primary)',
-    border: '1px solid var(--bg-tertiary)',
+    background: '#1A202C',
+    border: '1px solid #4A5568',
     borderRadius: 6,
-    color: 'var(--text-primary)',
+    color: '#F7FAFC',
     fontSize: 15,
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: '40px auto', padding: 32, background: 'var(--bg-secondary)', borderRadius: 12, boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}>
-      <h2 style={{ marginBottom: 24, fontSize: 22, fontWeight: 700, color: 'var(--gold)' }}>创建拍卖品</h2>
+    <div style={{ maxWidth: 600, margin: '40px auto', padding: 32, background: '#2D3748', borderRadius: 12, boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}>
+      <h2 style={{ marginBottom: 24, fontSize: 22, fontWeight: 700, color: '#D69E2E' }}>创建拍卖品</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 6, color: 'var(--text-secondary)', fontSize: 14 }}>名称 *</label>
+          <label style={{ display: 'block', marginBottom: 6, color: '#CBD5E0', fontSize: 14 }}>名称 *</label>
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="拍卖品名称" style={inputStyle} />
         </div>
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 6, color: 'var(--text-secondary)', fontSize: 14 }}>描述 *</label>
+          <label style={{ display: 'block', marginBottom: 6, color: '#CBD5E0', fontSize: 14 }}>描述 *</label>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="拍卖品描述" rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
         </div>
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 6, color: 'var(--text-secondary)', fontSize: 14 }}>起拍价 (元) *</label>
+          <label style={{ display: 'block', marginBottom: 6, color: '#CBD5E0', fontSize: 14 }}>起拍价 (元) *</label>
           <input type="number" value={startPrice} onChange={(e) => setStartPrice(e.target.value)} placeholder="0.00" min="0" step="0.01" style={inputStyle} />
         </div>
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 6, color: 'var(--text-secondary)', fontSize: 14 }}>截止时间 *</label>
+          <label style={{ display: 'block', marginBottom: 6, color: '#CBD5E0', fontSize: 14 }}>截止时间 *</label>
           <input type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)} style={inputStyle} />
         </div>
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 6, color: 'var(--text-secondary)', fontSize: 14 }}>图片URL（每行一个）*</label>
+          <label style={{ display: 'block', marginBottom: 6, color: '#CBD5E0', fontSize: 14 }}>图片URL（每行一个）*</label>
           <textarea value={images} onChange={(e) => setImages(e.target.value)} placeholder="https://example.com/image1.jpg
 https://example.com/image2.jpg" rows={3} style={{ ...inputStyle, resize: 'vertical' }} />
         </div>
         {imageUrls.length > 0 && (
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 6, color: 'var(--text-secondary)', fontSize: 14 }}>图片预览</label>
+            <label style={{ display: 'block', marginBottom: 6, color: '#CBD5E0', fontSize: 14 }}>图片预览</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {imageUrls.map((url, i) => (
-                <img key={i} src={url} alt={`预览 ${i + 1}`} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6, border: '1px solid var(--bg-tertiary)' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                <img key={i} src={url} alt={`预览 ${i + 1}`} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6, border: '1px solid #4A5568' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               ))}
             </div>
           </div>
         )}
 
         {error && (
-          <div style={{ marginBottom: 16, padding: '8px 12px', background: 'rgba(245,101,101,0.15)', border: '1px solid var(--error)', borderRadius: 6, color: 'var(--error)', fontSize: 14 }}>
+          <div style={{ marginBottom: 16, padding: '8px 12px', background: 'rgba(245,101,101,0.15)', border: '1px solid #F56565', borderRadius: 6, color: '#F56565', fontSize: 14 }}>
             {error}
           </div>
         )}
 
-        <button type="submit" disabled={loading} style={{ width: '100%', padding: '12px 0', fontSize: 16, fontWeight: 700, border: 'none', borderRadius: 8, background: loading ? 'var(--bg-tertiary)' : 'linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light))', color: loading ? 'var(--text-muted)' : 'var(--bg-primary)', cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          {loading && <span style={{ display: 'inline-block', width: 18, height: 18, border: '2.5px solid var(--blue)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
+        <button type="submit" disabled={loading} style={{ width: '100%', padding: '12px 0', fontSize: 16, fontWeight: 700, border: 'none', borderRadius: 8, background: loading ? '#4A5568' : 'linear-gradient(135deg, #B7791F, #D69E2E, #ECC94B)', color: loading ? '#A0AEC0' : '#1A202C', cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          {loading && <span style={{ display: 'inline-block', width: 18, height: 18, border: '2.5px solid #4299E1', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
           {loading ? '提交中...' : '提交审核'}
         </button>
       </form>
-      <p style={{ marginTop: 16, fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>
+      <p style={{ marginTop: 16, fontSize: 13, color: '#A0AEC0', textAlign: 'center' }}>
         提交后将进入审核状态，审核通过后方可上架拍卖
       </p>
     </div>

@@ -225,32 +225,30 @@ app.get('/api/items/:id', (req: Request, res: Response) => {
   });
 });
 
-app.post('/api/favorites', (req: Request, res: Response) => {
-  const { userId, itemId, favorited } = req.body;
-  if (!userId || !itemId) return res.status(400).json({ error: '参数不完整' });
-  const userFavorites = favorites.get(userId) || new Set();
-  if (favorited) {
-    userFavorites.add(itemId);
-  } else {
-    userFavorites.delete(itemId);
+
+app.post('/api/items', (req: Request, res: Response) => {
+  const { name, description, startPrice, endTime, images, userId } = req.body;
+  if (!name || !description || !startPrice || !endTime || !userId) {
+    return res.status(400).json({ error: 'missing fields' });
   }
-  favorites.set(userId, userFavorites);
-  res.json({ success: true, favorited });
-});
-
-app.get('/api/favorites/:userId', (req: Request, res: Response) => {
-  const userId = req.params.userId;
-  const userFavorites = favorites.get(userId) || new Set();
-  const favoriteItems: AuctionItem[] = [];
-  userFavorites.forEach(itemId => {
-    const item = items.get(itemId);
-    if (item) favoriteItems.push(item);
-  });
-  favoriteItems.sort((a, b) => b.createdAt - a.createdAt);
-  res.json({ items: favoriteItems });
-});
-
-const PORT = 3001;
-server.listen(PORT, () => {
-  console.log(`服务器运行在 http://localhost:${PORT}`);
+  const user = users.get(userId);
+  if (!user) return res.status(401).json({ error: 'user not found' });
+  const imageList = images && images.length > 0 ? images : [];
+  const itemId = uuidv4();
+  const item: AuctionItem = {
+    id: itemId,
+    name,
+    description,
+    startPrice: Number(startPrice),
+    currentPrice: Number(startPrice),
+    endTime: new Date(endTime).getTime(),
+    images: imageList,
+    status: 'pending',
+    creatorId: userId,
+    creatorName: user.username,
+    createdAt: Date.now(),
+  };
+  items.set(itemId, item);
+  bids.set(itemId, []);
+  res.json({ success: true, item });
 });

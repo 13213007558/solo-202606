@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../App';
 
 type Mode = 'login' | 'register';
 
@@ -49,27 +49,27 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '60px auto', padding: 32, background: 'var(--bg-secondary)', borderRadius: 12, boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}>
+    <div style={{ maxWidth: 400, margin: '60px auto', padding: 32, background: '#2D3748', borderRadius: 12, boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}>
       <div style={{ display: 'flex', marginBottom: 24, borderRadius: 8, overflow: 'hidden' }}>
-        <button onClick={() => { setMode('login'); setError(''); }} style={{ flex: 1, padding: '10px 0', fontSize: 16, fontWeight: 600, background: mode === 'login' ? 'var(--gold)' : 'var(--bg-tertiary)', color: mode === 'login' ? 'var(--bg-primary)' : 'var(--text-secondary)', transition: 'all 0.2s' }}>登录</button>
-        <button onClick={() => { setMode('register'); setError(''); }} style={{ flex: 1, padding: '10px 0', fontSize: 16, fontWeight: 600, background: mode === 'register' ? 'var(--gold)' : 'var(--bg-tertiary)', color: mode === 'register' ? 'var(--bg-primary)' : 'var(--text-secondary)', transition: 'all 0.2s' }}>注册</button>
+        <button onClick={() => { setMode('login'); setError(''); }} style={{ flex: 1, padding: '10px 0', fontSize: 16, fontWeight: 600, background: mode === 'login' ? '#D69E2E' : '#4A5568', color: mode === 'login' ? '#1A202C' : '#CBD5E0', transition: 'all 0.2s' }}>登录</button>
+        <button onClick={() => { setMode('register'); setError(''); }} style={{ flex: 1, padding: '10px 0', fontSize: 16, fontWeight: 600, background: mode === 'register' ? '#D69E2E' : '#4A5568', color: mode === 'register' ? '#1A202C' : '#CBD5E0', transition: 'all 0.2s' }}>注册</button>
       </div>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 6, color: 'var(--text-secondary)', fontSize: 14 }}>用户名</label>
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="请输入用户名" style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--bg-tertiary)', borderRadius: 6, color: 'var(--text-primary)', fontSize: 15 }} />
+          <label style={{ display: 'block', marginBottom: 6, color: '#CBD5E0', fontSize: 14 }}>用户名</label>
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="请输入用户名" style={{ width: '100%', padding: '10px 12px', background: '#1A202C', border: '1px solid #4A5568', borderRadius: 6, color: '#F7FAFC', fontSize: 15 }} />
         </div>
         <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', marginBottom: 6, color: 'var(--text-secondary)', fontSize: 14 }}>密码</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="请输入密码" style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-primary)', border: '1px solid var(--bg-tertiary)', borderRadius: 6, color: 'var(--text-primary)', fontSize: 15 }} />
+          <label style={{ display: 'block', marginBottom: 6, color: '#CBD5E0', fontSize: 14 }}>密码</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="请输入密码" style={{ width: '100%', padding: '10px 12px', background: '#1A202C', border: '1px solid #4A5568', borderRadius: 6, color: '#F7FAFC', fontSize: 15 }} />
         </div>
         {error && (
-          <div style={{ marginBottom: 16, padding: '8px 12px', background: 'rgba(245,101,101,0.15)', border: '1px solid var(--error)', borderRadius: 6, color: 'var(--error)', fontSize: 14 }}>
+          <div style={{ marginBottom: 16, padding: '8px 12px', background: 'rgba(245,101,101,0.15)', border: '1px solid #F56565', borderRadius: 6, color: '#F56565', fontSize: 14 }}>
             {error}
           </div>
         )}
-        <button type="submit" disabled={loading} style={{ width: '100%', padding: '12px 0', fontSize: 16, fontWeight: 700, border: 'none', borderRadius: 8, background: loading ? 'var(--bg-tertiary)' : 'linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light))', color: loading ? 'var(--text-muted)' : 'var(--bg-primary)', cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          {loading && <span style={{ display: 'inline-block', width: 18, height: 18, border: '2.5px solid var(--blue)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
+        <button type="submit" disabled={loading} style={{ width: '100%', padding: '12px 0', fontSize: 16, fontWeight: 700, border: 'none', borderRadius: 8, background: loading ? '#4A5568' : 'linear-gradient(135deg, #B7791F, #D69E2E, #ECC94B)', color: loading ? '#A0AEC0' : '#1A202C', cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          {loading && <span style={{ display: 'inline-block', width: 18, height: 18, border: '2.5px solid #4299E1', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />}
           {loading ? '处理中...' : mode === 'login' ? '登录' : '注册'}
         </button>
       </form>
