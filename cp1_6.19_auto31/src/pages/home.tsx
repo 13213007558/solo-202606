@@ -58,7 +58,8 @@ const EventCard: React.FC<{ event: Event; onJoin?: () => void }> = ({ event, onJ
   const navigate = useNavigate();
   const { user } = useAuth();
   const isFull = event.currentParticipants >= event.maxParticipants;
-  const isEnded = event.status === 'ended';
+  const isDatePassed = new Date(event.dateTime) < new Date();
+  const isEnded = event.status === 'ended' || isDatePassed;
   const isDisabled = isFull || isEnded;
 
   const formatDate = (dateStr: string) => {
@@ -608,8 +609,13 @@ const Home: React.FC = () => {
         }
 
         .event-card.disabled {
-          opacity: 0.7;
-          filter: grayscale(30%);
+          opacity: 0.55;
+          filter: grayscale(70%);
+          cursor: default;
+        }
+
+        .event-card.disabled .card-image img {
+          filter: grayscale(100%) brightness(0.8);
         }
 
         .event-card.disabled:hover {

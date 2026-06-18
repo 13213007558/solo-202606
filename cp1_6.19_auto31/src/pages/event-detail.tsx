@@ -343,22 +343,26 @@ const detailStyles = `
 
   .detail-hero {
     position: relative;
-    height: 280px;
+    height: 340px;
     border-radius: 16px;
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   }
 
   .hero-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
   }
 
   .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 30%, rgba(0, 0, 0, 0.7));
+    background: 
+      linear-gradient(135deg, rgba(45, 107, 59, 0.4) 0%, rgba(212, 167, 106, 0.15) 50%, transparent 100%),
+      linear-gradient(to bottom, transparent 25%, rgba(0, 0, 0, 0.78) 100%);
   }
 
   .hero-content {

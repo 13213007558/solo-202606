@@ -96,6 +96,8 @@ export const awardActivity = async (
   return response.data;
 };
 
+export const grantHoursAndBadge = awardActivity;
+
 export const login = async (username: string, password: string): Promise<{ user: User }> => {
   const response = await api.post('/auth/login', { username, password });
   return response.data;
