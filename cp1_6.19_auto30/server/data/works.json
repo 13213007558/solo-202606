@@ -12,8 +12,10 @@
       "流行"
     ],
     "status": "published",
-    "likes": 0,
-    "likedBy": [],
+    "likes": 1,
+    "likedBy": [
+      "0e54633e-c833-48fd-994a-4c5dbea47798"
+    ],
     "comments": [
       {
         "id": "a7a10c15-8077-4013-8e54-a5731febb3fc",

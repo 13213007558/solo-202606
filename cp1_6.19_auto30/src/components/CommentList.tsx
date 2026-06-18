@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import '../styles/commentList.css';
@@ -25,7 +25,6 @@ const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => 
   const [replyContent, setReplyContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
-  const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -105,13 +104,22 @@ const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => 
     }
   };
 
-  useEffect(() => {
-    if (activeReplyId && replyTextareaRef.current) {
+  const setTextareaRef = (el: HTMLTextAreaElement | null) => {
+    if (el) {
       setTimeout(() => {
-        replyTextareaRef.current?.focus();
-      }, 50);
+        el.focus();
+        el.classList.add('focused');
+      }, 30);
     }
-  }, [activeReplyId]);
+  };
+
+  const handleInputFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    e.target.classList.add('focused');
+  };
+
+  const handleInputBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    e.target.classList.remove('focused');
+  };
 
   const toggleRepliesExpand = (commentId: string) => {
     setExpandedReplies(prev => {
@@ -125,7 +133,7 @@ const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => 
     });
   };
 
-  const renderComment = (comment: Comment, isReply = false) => (
+  const renderComment = (comment: Comment, isReply = false, replyIndex?: number, totalReplies?: number, parentCommentId?: string) => (
     <div key={comment.id} className={`comment ${isReply ? 'reply' : ''}`}>
       <div className="comment-header">
         <div className="avatar avatar-sm">{comment.username.charAt(0).toUpperCase()}</div>
@@ -134,7 +142,17 @@ const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => 
           <span className="comment-date">{formatDate(comment.createdAt)}</span>
         </div>
       </div>
-      <div className="comment-content">{comment.content}</div>
+      <div className="comment-content">
+        {comment.content}
+        {isReply && !expandedReplies.has(parentCommentId || '') && replyIndex === 1 && totalReplies && totalReplies > 2 && (
+          <button 
+            className="view-all-replies-btn view-all-inline"
+            onClick={() => toggleRepliesExpand(parentCommentId || '')}
+          >
+            查看全部 {totalReplies} 条回复
+          </button>
+        )}
+      </div>
       {user && (
         <button 
           className="reply-btn"
@@ -146,9 +164,12 @@ const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => 
       {activeReplyId === comment.id && (
         <div className="reply-form">
           <textarea
-            ref={replyTextareaRef}
+            ref={setTextareaRef}
+            className="reply-input"
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
             placeholder="写下你的回复..."
             rows={2}
           />
@@ -175,17 +196,15 @@ const CommentList = ({ comments, workId, onCommentAdded }: CommentListProps) => 
       {comment.replies && comment.replies.length > 0 && !isReply && (
         <div className="replies">
           {expandedReplies.has(comment.id) 
-            ? comment.replies.map(reply => renderComment(reply, true))
-            : comment.replies.slice(0, 2).map(reply => renderComment(reply, true))
+            ? comment.replies.map((reply, idx) => renderComment(reply, true, idx, comment.replies.length, comment.id))
+            : comment.replies.slice(0, 2).map((reply, idx) => renderComment(reply, true, idx, comment.replies.length, comment.id))
           }
-          {comment.replies.length > 2 && (
+          {expandedReplies.has(comment.id) && comment.replies.length > 2 && (
             <button 
               className="view-all-replies-btn"
               onClick={() => toggleRepliesExpand(comment.id)}
             >
-              {expandedReplies.has(comment.id) 
-                ? '收起回复' 
-                : `查看全部 ${comment.replies.length} 条回复`}
+              收起回复
             </button>
           )}
         </div>
