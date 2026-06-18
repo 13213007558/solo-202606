@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "9abefa6d-d2a0-4b2f-a77f-671468847d1f",
+    "projectId": "a0e61d5d-9d88-4c5f-b340-b6dd644caace",
+    "title": "完成项目初始化和基础布局",
+    "content": "- 使用 React Router v6 配置了路由\n- 完成了侧边栏和主内容区布局\n- 实现了项目卡片组件",
+    "date": "2026-06-18",
+    "mood": "🚀",
+    "createdAt": "2026-06-18T23:25:12.628Z"
+  }
+]
