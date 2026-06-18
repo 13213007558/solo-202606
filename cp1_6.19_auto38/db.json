@@ -1,0 +1,116 @@
+{
+  "exhibitions": [
+    {
+      "id": "exh-001",
+      "name": "古埃及文明探秘",
+      "startDate": "2026-07-01",
+      "endDate": "2026-09-30",
+      "capacity": 100,
+      "description": "穿越千年时光，探索古埃及文明的神秘魅力。本次展览汇集了来自开罗博物馆的珍贵文物，包括法老面具、木乃伊棺椁、象形文字石碑等百余件展品，带您领略尼罗河畔的辉煌历史。",
+      "coverImage": "https://images.unsplash.com/photo-1594736797933-d0d68dc31b22?w=800",
+      "images": [
+        "https://images.unsplash.com/photo-1594736797933-d0d68dc31b22?w=1200",
+        "https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=1200",
+        "https://images.unsplash.com/photo-1566127444979-b3d2b654e3d7?w=1200"
+      ]
+    },
+    {
+      "id": "exh-002",
+      "name": "印象派大师作品展",
+      "startDate": "2026-06-15",
+      "endDate": "2026-08-15",
+      "capacity": 80,
+      "description": "莫奈、雷诺阿、德加...印象派巨匠的真迹首次齐聚本馆。本次展览展出30余幅19世纪印象派代表作品，让您在光影变幻中感受艺术的无限魅力。",
+      "coverImage": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800",
+      "images": [
+        "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200",
+        "https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=1200",
+        "https://images.unsplash.com/photo-1577720643272-265f09367456?w=1200"
+      ]
+    },
+    {
+      "id": "exh-003",
+      "name": "太空探索科技展",
+      "startDate": "2026-05-01",
+      "endDate": "2026-07-31",
+      "capacity": 150,
+      "description": "从嫦娥探月到火星探测，从神舟飞船到空间站建设，本次展览通过实物模型、互动体验和VR技术，全方位展示人类探索太空的伟大历程。",
+      "coverImage": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800",
+      "images": [
+        "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1200",
+        "https://images.unsplash.com/photo-1454789548928-9efd52dc4031?w=1200",
+        "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1200"
+      ]
+    },
+    {
+      "id": "exh-004",
+      "name": "丝绸之路文物大展",
+      "startDate": "2026-08-01",
+      "endDate": "2026-10-31",
+      "capacity": 120,
+      "description": "跨越万里的文明对话，千年古道的璀璨明珠。本次展览汇集了丝路沿线各国的珍贵文物，讲述了东西方文明交流互鉴的动人故事。",
+      "coverImage": "https://images.unsplash.com/photo-1548013146-72479768bada?w=800",
+      "images": [
+        "https://images.unsplash.com/photo-1548013146-72479768bada?w=1200",
+        "https://images.unsplash.com/photo-1594736797933-d0d68dc31b22?w=1200",
+        "https://images.unsplash.com/photo-1566127444979-b3d2b654e3d7?w=1200"
+      ]
+    }
+  ],
+  "bookings": [
+    {
+      "id": "booking-001",
+      "exhibitionId": "exh-001",
+      "name": "张三",
+      "phone": "13800138001",
+      "date": "2026-07-15",
+      "count": 2,
+      "status": "confirmed",
+      "verificationCode": "A7X9K2",
+      "seatNumber": "A12, A13"
+    },
+    {
+      "id": "booking-002",
+      "exhibitionId": "exh-002",
+      "name": "李四",
+      "phone": "13900139002",
+      "date": "2026-07-20",
+      "count": 1,
+      "status": "pending",
+      "verificationCode": "B3M5P8",
+      "seatNumber": "B08"
+    },
+    {
+      "id": "booking-003",
+      "exhibitionId": "exh-003",
+      "name": "王五",
+      "phone": "13700137003",
+      "date": "2026-07-10",
+      "count": 3,
+      "status": "cancelled",
+      "verificationCode": "C9R4T6",
+      "seatNumber": "C05, C06, C07"
+    },
+    {
+      "id": "booking-0f7b1b00",
+      "exhibitionId": "exh-001",
+      "name": "测试用户",
+      "phone": "13800138000",
+      "date": "2026-07-01",
+      "count": 1,
+      "status": "pending",
+      "verificationCode": "I1E45X",
+      "seatNumber": "E03",
+      "createdAt": "2026-06-18T23:17:13.417Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "user-001",
+      "username": "admin",
+      "password": "admin123",
+      "role": "admin",
+      "museumName": "星河博物馆"
+    }
+  ]
+}
