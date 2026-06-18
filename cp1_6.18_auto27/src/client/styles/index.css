@@ -1,0 +1,66 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #1A1B2F;
+  --bg-card: #252A4A;
+  --accent: #7C5CFC;
+  --accent-light: #9B82FF;
+  --accent-glow: rgba(124, 92, 252, 0.3);
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A4C4;
+  --border-glow: 0.5px solid rgba(124, 92, 252, 0.3);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: transform 150ms ease-out;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+input, textarea, select {
+  font-family: inherit;
+  outline: none;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.stats-panel-hot {
+  background: linear-gradient(-45deg, #252A4A, #7C5CFC, #252A4A, #9B82FF);
+  background-size: 400% 400%;
+  animation: gradientShift 3s ease infinite;
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.5s ease-out;
+}
+
+.card {
+  background-color: var(--bg-card);
+  border: var(--border-glow);
+  box-shadow: 0 0 20px rgba(124, 92, 252, 0.1);
+  border-radius: 16px;
+}
+
+@media (max-width: 768px) {
+  .skill-tree-container {
+    height: 50vh !important;
+  }
+}
