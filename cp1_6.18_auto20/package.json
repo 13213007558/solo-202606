@@ -1,0 +1,12 @@
+{
+  "name": "festival-event-manager",
+  "version": "1.0.0",
+  "description": "节日活动日程管理与社交分享应用",
+  "scripts": {
+    "dev": "concurrently \"cd backend && npm start\" \"cd frontend && npm run dev\"",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
