@@ -35,6 +35,35 @@ const formatRelativeTime = (ts: number, now: number) => {
   return `${Math.floor(mo / 12)}年前`;
 };
 
+const pad = (n: number) => n.toString().padStart(2, '0');
+
+const formatAbsoluteTime = (ts: number) => {
+  const d = new Date(ts);
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};
+
+const PARTICLE_COLORS = ['#FFD700', '#4F46E5'];
+
+interface ParticleData {
+  id: number;
+  angle: number;
+  distance: number;
+  color: string;
+  size: number;
+  duration: number;
+}
+
+const generateParticles = (count: number = 14): ParticleData[] => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    angle: Math.random() * 360,
+    distance: 24 + Math.random() * 28,
+    color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
+    size: 2 + Math.random() * 4,
+    duration: 0.5 + Math.random() * 0.4,
+  }));
+};
+
 const highlightText = (html: string, kw: string) => {
   if (!kw.trim()) return html;
   const stripped = html.replace(/<[^>]*>/g, ' ');
@@ -52,6 +81,8 @@ const highlightText = (html: string, kw: string) => {
 const IdeaCard = ({ card, searchKeyword, onToggleFavorite, index, animationKey }: IdeaCardProps) => {
   const [now, setNow] = useState(Date.now());
   const [showParticles, setShowParticles] = useState(false);
+  const [particles, setParticles] = useState<ParticleData[]>([]);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [imageIdx, setImageIdx] = useState(0);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [liveWave, setLiveWave] = useState<number[]>(card.audioWaveform || new Array(40).fill(0.2));
@@ -72,8 +103,9 @@ const IdeaCard = ({ card, searchKeyword, onToggleFavorite, index, animationKey }
   const handleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!card.favorite) {
+      setParticles(generateParticles());
       setShowParticles(true);
-      setTimeout(() => setShowParticles(false), 700);
+      setTimeout(() => setShowParticles(false), 900);
     }
     onToggleFavorite(card.id);
   };
@@ -201,15 +233,34 @@ const IdeaCard = ({ card, searchKeyword, onToggleFavorite, index, animationKey }
     >
       {renderContent()}
       <div className="card-footer">
-        <span className="card-time">{formatRelativeTime(card.createdAt, now)}</span>
+        <span
+          className="card-time"
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          {formatRelativeTime(card.createdAt, now)}
+          {showTooltip && (
+            <span className="time-tooltip">{formatAbsoluteTime(card.createdAt)}</span>
+          )}
+        </span>
         <button
           className={`fav-btn ${card.favorite ? 'active' : ''}`}
           onClick={handleFavorite}
         >
           {showParticles && (
             <>
-              {Array.from({ length: 8 }).map((_, i) => (
-                <span key={i} className="particle" style={{ '--i': i } as React.CSSProperties} />
+              {particles.map((p) => (
+                <span
+                  key={p.id}
+                  className="particle"
+                  style={{
+                    '--angle': `${p.angle}deg`,
+                    '--distance': `${p.distance}px`,
+                    '--color': p.color,
+                    '--size': `${p.size}px`,
+                    '--duration': `${p.duration}s`,
+                  } as React.CSSProperties}
+                />
               ))}
             </>
           )}
