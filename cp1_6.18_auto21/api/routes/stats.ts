@@ -32,18 +32,18 @@ router.get('/', (_req: Request, res: Response): void => {
       memberMap.set(t.assigneeId, (memberMap.get(t.assigneeId) || 0) + 1)
     }
   }
-  const memberStats = Array.from(memberMap.entries()) .map(([userId, completedCount]) => {
+  const memberStats = Array.from(memberMap.entries()) .map(([userId, completedTasks]) => {
     const user = users.get(userId)
-    return { userId, username: user?.username || '', completedCount }
+    return { userId, username: user?.username || '', completedTasks }
   })
 
-  const dailyTrend: { date: string; count: number }[] = []
+  const dailyTrend: { date: string; newTasks: number }[] = []
   for (let i = 6; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
     const dateStr = d.toISOString().slice(0, 10)
-    const count = allTasks.filter((t) => t.createdAt.slice(0, 10) === dateStr).length
-    dailyTrend.push({ date: dateStr, count })
+    const newTasks = allTasks.filter((t) => t.createdAt.slice(0, 10) === dateStr).length
+    dailyTrend.push({ date: dateStr, newTasks })
   }
 
   res.json({
