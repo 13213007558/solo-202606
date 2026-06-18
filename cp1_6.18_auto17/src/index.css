@@ -204,7 +204,7 @@ body {
   top: 12px;
   left: 12px;
   background: rgba(0, 0, 0, 0.7);
-  color: #A0AEC0;
+  color: var(--text-muted);
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 0.8rem;
@@ -230,19 +230,19 @@ body {
 
 .countdown-text-label {
   font-size: 0.75rem;
-  color: #A0AEC0;
+  color: var(--text-muted);
 }
 
 .countdown-text-value {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #D69E2E;
+  color: var(--accent-gold);
   font-family: 'Courier New', monospace;
   letter-spacing: 1px;
 }
 
 .countdown-text-value.ended {
-  color: #718096;
+  color: var(--text-muted);
 }
 
 .card-favorite-btn {
@@ -268,4 +268,12 @@ body {
 
 .card-favorite-btn.favorited:hover {
   background: rgba(229, 62, 62, 0.1);
+}
+
+.card-favorite-btn {
+  color: var(--text-muted);
+}
+
+.card-favorite-btn .heart-icon.filled {
+  color: var(--accent-gold);
 }

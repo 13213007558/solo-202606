@@ -42,8 +42,9 @@ const HeartIcon = ({ filled }: { filled: boolean }) => (
     viewBox="0 0 24 24"
     width="18"
     height="18"
-    fill={filled ? '#D69E2E' : 'none'}
-    stroke={filled ? '#D69E2E' : '#A0AEC0'}
+    className={`heart-icon ${filled ? 'filled' : ''}`}
+    fill={filled ? 'currentColor' : 'none'}
+    stroke="currentColor"
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -65,6 +66,7 @@ export default function AuctionCard({
   const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
+    setTimeLeft(calculateTimeLeft(endTime));
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft(endTime));
     }, 1000);
