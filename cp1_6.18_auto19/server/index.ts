@@ -128,7 +128,6 @@ app.get("/api/visitors", (req, res) => {
   res.json({ count: visitorCount })
 })
 
-const PORT = 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
