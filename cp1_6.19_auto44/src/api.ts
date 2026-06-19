@@ -14,6 +14,11 @@ const api = axios.create({
   timeout: 5000
 });
 
+export interface SuggestionItem {
+  text: string;
+  type: 'recipe' | 'ingredient';
+}
+
 export const authApi = {
   register: (username: string, password: string) =>
     api.post<SafeUser>('/users/register', { username, password }).then((r) => r.data),
@@ -57,6 +62,11 @@ export const recipeApi = {
         { userId }
       )
       .then((r) => r.data)
+};
+
+export const searchApi = {
+  getSuggestions: (q: string) =>
+    api.get<SuggestionItem[]>('/search/suggestions', { params: { q } }).then((r) => r.data)
 };
 
 export const challengeApi = {

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Recipe, Challenge } from '../types';
-import { recipeApi, challengeApi } from '../api';
+import { recipeApi, challengeApi, searchApi } from '../api';
+import type { SuggestionItem } from '../api';
 import RecipeCard from '../components/RecipeCard';
 
 const Home: React.FC = () => {
@@ -13,7 +14,7 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [suggestions, setSuggestions] = useState<Recipe[]>([]);
+  const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
   const searchWrapperRef = useRef<HTMLDivElement>(null);
   const searchTimerRef = useRef<number | null>(null);
   const loadedRef = useRef(false);
@@ -69,22 +70,34 @@ const Home: React.FC = () => {
         setShowSuggestions(false);
         return;
       }
-      setShowSuggestions(true);
+      const kw = val.trim();
       try {
-        const results = await recipeApi.getRecipes({ search: val.trim() });
-        setRecipes(results);
-        setSuggestions(results.slice(0, 6));
+        const [sugList, recipeList] = await Promise.all([
+          searchApi.getSuggestions(kw).catch(() => [] as SuggestionItem[]),
+          recipeApi.getRecipes({ search: kw })
+        ]);
+        setSuggestions(sugList);
+        setShowSuggestions(sugList.length > 0);
+        setRecipes(recipeList);
       } catch {
         setRecipes([]);
         setSuggestions([]);
+        setShowSuggestions(false);
       }
-    }, 120);
   }, [allRecipes]);
 
-  const handleSuggestionClick = (recipe: Recipe) => {
-    setSearchQuery(recipe.name);
+  const handleSuggestionClick = (item: SuggestionItem) => {
+    setSearchQuery(item.text);
     setShowSuggestions(false);
-    navigate(`/recipe/${recipe.id}`);
+    if (searchTimerRef.current) window.clearTimeout(searchTimerRef.current);
+    (async () => {
+      try {
+        const results = await recipeApi.getRecipes({ search: item.text });
+        setRecipes(results);
+      } catch {
+        setRecipes([]);
+      }
+    })();
   };
 
   const onLikeUpdate = (id: string, likes: number) => {
@@ -92,7 +105,6 @@ const Home: React.FC = () => {
       list.map((r) => (r.id === id ? { ...r, likes } : r));
     setRecipes(updater);
     setAllRecipes(updater);
-    setSuggestions(updater);
   };
 
   return (
@@ -115,6 +127,19 @@ const Home: React.FC = () => {
           onFocus={() => {
             if (searchQuery.trim() && suggestions.length > 0) {
               setShowSuggestions(true);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setShowSuggestions(false);
+              if (searchTimerRef.current) window.clearTimeout(searchTimerRef.current);
+              (async () => {
+                try {
+                  const kw = searchQuery.trim();
+                  if (!kw) setRecipes(allRecipes);
+                  else setRecipes(await recipeApi.getRecipes({ search: kw }));
+                } catch { setRecipes([]); }
+              })();
             }
           }}
         />
