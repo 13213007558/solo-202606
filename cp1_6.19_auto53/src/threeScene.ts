@@ -54,7 +54,7 @@ export class ThreeScene {
     }
 
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x1a1a2e);
+    this.scene.background = null;
 
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
@@ -65,10 +65,11 @@ export class ThreeScene {
     this.updateCameraPositionFromSpherical();
     this.camera.lookAt(0, 0, 0);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.shadowMap.enabled = true;
+    this.renderer.setClearColor(0x000000, 0);
     this.container.appendChild(this.renderer.domElement);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
@@ -99,22 +100,7 @@ export class ThreeScene {
     this.modeAnimation = { active: false, startTime: 0, duration: 300, fromMode: 'ball-stick', toMode: 'ball-stick' };
     this.resetAnimation = { active: false, startTime: 0, duration: 600, startSpherical: { radius: 0, theta: 0, phi: 0 } };
 
-    this.infoPanel = document.createElement('div');
-    this.infoPanel.style.cssText = `
-      position: absolute;
-      background: rgba(0, 0, 0, 0.85);
-      color: #fff;
-      padding: 10px 14px;
-      border-radius: 6px;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 13px;
-      pointer-events: none;
-      display: none;
-      z-index: 1000;
-      border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    `;
-    this.container.appendChild(this.infoPanel);
+    this.infoPanel = document.getElementById('atom-info-panel') as HTMLElement;
 
     this.setupEventListeners();
     this.animate();
@@ -228,6 +214,7 @@ export class ThreeScene {
         color: elementInfo.cpkColor,
         roughness: 0.3,
         metalness: 0.1,
+        wireframe: this.currentMode === 'wireframe',
       });
 
       const mesh = new THREE.Mesh(geometry, material);
@@ -284,7 +271,6 @@ export class ThreeScene {
       case 'space-fill':
         return atom.radius * 1.2;
       case 'wireframe':
-        return 0.15;
       case 'ball-stick':
       default:
         return atom.radius * 0.6;
@@ -367,6 +353,7 @@ export class ThreeScene {
       transparent: true,
       opacity: this.getBondOpacityForMode(this.currentMode),
       depthWrite: this.getBondOpacityForMode(this.currentMode) > 0.5,
+      wireframe: this.currentMode === 'wireframe',
     });
 
     const mesh = new THREE.Mesh(geometry, material);
@@ -389,10 +376,10 @@ export class ThreeScene {
   private showAtomInfo(atomData: AtomData, screenX: number, screenY: number): void {
     const elementInfo = ELEMENT_DATA[atomData.symbol];
     this.infoPanel.innerHTML = `
-      <div style="font-weight:600;font-size:15px;margin-bottom:4px;">${atomData.symbol}</div>
-      <div style="opacity:0.8;">Atomic Number: ${atomData.atomicNumber}</div>
-      <div style="opacity:0.8;">Bonds: ${atomData.bonds.length}</div>
-      <div style="opacity:0.8;">Max Bonds: ${elementInfo.maxBonds}</div>
+      <div class="symbol">${atomData.symbol}</div>
+      <div class="atom-info-line">Atomic Number: <span>${atomData.atomicNumber}</span></div>
+      <div class="atom-info-line">Bonds: <span>${atomData.bonds.length}</span></div>
+      <div class="atom-info-line">Max Bonds: <span>${elementInfo.maxBonds}</span></div>
     `;
     const rect = this.container.getBoundingClientRect();
     let left = screenX - rect.left + 15;
@@ -401,11 +388,11 @@ export class ThreeScene {
     if (top + 100 > rect.height) top = screenY - rect.top - 110;
     this.infoPanel.style.left = `${left}px`;
     this.infoPanel.style.top = `${top}px`;
-    this.infoPanel.style.display = 'block';
+    this.infoPanel.classList.add('visible');
   }
 
   private hideAtomInfo(): void {
-    this.infoPanel.style.display = 'none';
+    this.infoPanel.classList.remove('visible');
   }
 
   private easeOutCubic(t: number): number {
@@ -434,6 +421,9 @@ export class ThreeScene {
       const t = Math.min(1, elapsed / this.modeAnimation.duration);
       const eased = this.easeOutCubic(t);
 
+      const toWireframe = this.modeAnimation.toMode === 'wireframe';
+      const fromWireframe = this.modeAnimation.fromMode === 'wireframe';
+
       this.atomMeshes.forEach((mesh) => {
         const atomData = mesh.userData.atomData as AtomData;
         const fromRadius = this.getAtomRadiusForMode(atomData, this.modeAnimation.fromMode);
@@ -442,6 +432,13 @@ export class ThreeScene {
 
         mesh.geometry.dispose();
         mesh.geometry = new THREE.SphereGeometry(currentRadius, 32, 32);
+
+        const mat = mesh.material as THREE.MeshStandardMaterial;
+        if (toWireframe && !fromWireframe) {
+          mat.wireframe = eased > 0.5;
+        } else if (!toWireframe && fromWireframe) {
+          mat.wireframe = eased < 0.5;
+        }
       });
 
       const fromOpacity = this.getBondOpacityForMode(this.modeAnimation.fromMode);
@@ -451,10 +448,23 @@ export class ThreeScene {
         const mat = mesh.material as THREE.MeshStandardMaterial;
         mat.opacity = currentOpacity;
         mat.depthWrite = currentOpacity > 0.5;
+        if (toWireframe && !fromWireframe) {
+          mat.wireframe = eased > 0.5;
+        } else if (!toWireframe && fromWireframe) {
+          mat.wireframe = eased < 0.5;
+        }
       });
 
       if (t >= 1) {
         this.modeAnimation.active = false;
+        this.atomMeshes.forEach((mesh) => {
+          const mat = mesh.material as THREE.MeshStandardMaterial;
+          mat.wireframe = toWireframe;
+        });
+        this.bondMeshes.forEach((mesh) => {
+          const mat = mesh.material as THREE.MeshStandardMaterial;
+          mat.wireframe = toWireframe;
+        });
       }
     }
 
@@ -491,8 +501,5 @@ export class ThreeScene {
       (mesh.material as THREE.Material).dispose();
     });
     this.renderer.dispose();
-    if (this.infoPanel.parentNode) {
-      this.infoPanel.parentNode.removeChild(this.infoPanel);
-    }
   }
 }

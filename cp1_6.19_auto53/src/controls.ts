@@ -67,7 +67,7 @@ export class UIController {
     if (this.errorTimeout !== null) window.clearTimeout(this.errorTimeout);
     this.errorTimeout = window.setTimeout(() => {
       this.errorToast.style.opacity = '0';
-      this.errorToast.style.transform = 'translateR(-10px)';
+      this.errorToast.style.transform = 'translateY(-10px)';
       window.setTimeout(() => { if (this.errorToast) this.errorToast.style.display = 'none'; }, 300);
     }, 3000);
   }
@@ -83,6 +83,40 @@ export class UIController {
       const btnMode = btn.getAttribute('data-mode');
       if (btnMode === mode) btn.classList.add('active');
       else btn.classList.remove('active');
+    });
+  }
+}
+    }
+
+    this.errorTimeout = window.setTimeout(() => {
+      this.errorToast.style.opacity = '0';
+      this.errorToast.style.transform = 'translateY(-10px)';
+      window.setTimeout(() => {
+        if (this.errorToast) {
+          this.errorToast.style.display = 'none';
+        }
+      }, 300);
+    }, 3000);
+  }
+
+  public updateStats(atoms: number, bonds: number): void {
+    if (this.atomCountEl) {
+      this.atomCountEl.textContent = String(atoms);
+    }
+    if (this.bondCountEl) {
+      this.bondCountEl.textContent = String(bonds);
+    }
+    this.callbacks.onStatsUpdate(atoms, bonds);
+  }
+
+  public setActiveMode(mode: DisplayMode): void {
+    this.modeBtns.forEach((btn) => {
+      const btnMode = btn.getAttribute('data-mode');
+      if (btnMode === mode) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
     });
   }
 }
