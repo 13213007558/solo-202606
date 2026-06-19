@@ -1,7 +1,1 @@
-import React from 'react';
-
-function App() {
-  return <div>我的阅读书架</div>;
-}
-
-export default App;
+import React from "react";import{Routes,Route,NavLink}from"react-router-dom";import Home from"./pages/Home";import Challenges from"./pages/Challenges";import Profile from"./pages/Profile";const App:React.FC=()=>{return(<div className="app"><nav className="navbar"><div className="navbar-brand">📚 阅读书架</div><ul className="navbar-links"><li><NavLink to="/" end className={({isActive})=>isActive?"active":""}>书架</NavLink></li><li><NavLink to="/challenges" className={({isActive})=>isActive?"active":""}>挑战</NavLink></li><li><NavLink to="/profile" className={({isActive})=>isActive?"active":""}>个人主页</NavLink></li></ul></nav><Routes><Route path="/" element={<Home/>}/><Route path="/challenges" element={<Challenges/>}/><Route path="/profile" element={<Profile/>}/></Routes></div>)};export default App;
