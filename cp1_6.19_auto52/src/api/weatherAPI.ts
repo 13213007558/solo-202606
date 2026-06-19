@@ -18,6 +18,7 @@ export interface WeatherData {
   windSpeed: number;
   precipitation: number;
   uvIndex: number;
+  detail?: string;
 }
 
 export interface CityWeather {
@@ -39,6 +40,13 @@ const WEATHER_DESCS: Record<WeatherType, string[]> = {
   cloudy: ['多云天气，偶有阳光', '云层较厚，气温适宜', '多云转晴，下午可见阳光'],
   overcast: ['阴天，光线较暗', '全天阴天，适合室内活动', '阴云密布，可能有小雨'],
   rainy: ['下午可能有阵雨', '小雨连绵，记得带伞', '局部有雷阵雨，注意安全']
+};
+
+const WEATHER_DETAILS: Record<WeatherType, string[]> = {
+  sunny: ['阳光充足，注意做好防晒措施，建议涂抹防晒霜并佩戴太阳镜', '晴空万里，紫外线较强，户外活动请做好防护', '天气晴好，气温较高，注意补充水分避免中暑'],
+  cloudy: ['多云间晴，温度适宜，是出行的好天气', '云层遮挡部分阳光，体感舒适，适合户外散步', '天空多云，偶有阳光穿透云层，气温适中'],
+  overcast: ['阴天持续，光线偏暗，建议选择室内活动', '全天阴沉，湿度较高，外出注意防潮', '云层较厚无降水，适合逛商场或博物馆等室内场所'],
+  rainy: ['有小雨，出门请携带雨具，路面湿滑注意安全', '降雨持续，建议选择室内活动，如需外出请穿防水鞋', '局部地区有阵雨，雨量不大但持续时间较长']
 };
 
 function seededRandom(seed: number): () => number {
@@ -95,12 +103,16 @@ function generateWeatherData(date: Date, city: string, random: () => number): We
   const descs = WEATHER_DESCS[weatherType];
   const weatherDesc = descs[Math.floor(random() * descs.length)];
 
+  const details = WEATHER_DETAILS[weatherType];
+  const detail = details[Math.floor(random() * details.length)];
+
   return {
     date: formatDate(date),
     dateObj: new Date(date),
     weatherType,
     weatherIcon: WEATHER_ICONS[weatherType],
     weatherDesc,
+    detail,
     highTemp,
     lowTemp,
     hourlyTemps,
@@ -109,6 +121,10 @@ function generateWeatherData(date: Date, city: string, random: () => number): We
     precipitation: weatherType === 'rainy' ? Math.round(60 + random() * 40) : Math.round(random() * 30),
     uvIndex: weatherType === 'sunny' ? Math.round(7 + random() * 4) : Math.round(1 + random() * 6)
   };
+}
+
+export function generateDetailFromType(weatherType: WeatherType): string {
+  return WEATHER_DETAILS[weatherType][0];
 }
 
 export async function fetchWeather(
