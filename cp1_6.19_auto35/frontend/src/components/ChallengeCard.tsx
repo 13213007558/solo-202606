@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Challenge, Book } from '../types';
 import axios from 'axios';
 
@@ -10,17 +10,46 @@ interface ChallengeCardProps {
 
 function ChallengeCard({ challenge, books, onUpdate }: ChallengeCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [animatedProgress, setAnimatedProgress] = useState(0);
   const [allBooks, setAllBooks] = useState<Book[]>(books);
+  const animationRef = useRef<number | null>(null);
 
   const completedCount = challenge.bookIds.length;
   const progress = Math.min((completedCount / challenge.targetBooks) * 100, 100);
 
+  const easeOutCubic = (t: number): number => {
+    return 1 - Math.pow(1 - t, 3);
+  };
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setAnimatedProgress(progress);
-    }, 300);
-    return () => clearTimeout(timer);
+    const duration = 1500;
+    const startTime = performance.now();
+    const startValue = 0;
+    const endValue = progress;
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progressRatio = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutCubic(progressRatio);
+      const currentValue = startValue + (endValue - startValue) * easedProgress;
+      setAnimatedProgress(currentValue);
+
+      if (progressRatio < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    const startDelay = setTimeout(() => {
+      animationRef.current = requestAnimationFrame(animate);
+    }, 200);
+
+    return () => {
+      clearTimeout(startDelay);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
   }, [progress]);
 
   useEffect(() => {
@@ -39,6 +68,8 @@ function ChallengeCard({ challenge, books, onUpdate }: ChallengeCardProps) {
   const availableBooks = allBooks.filter(
     b => b.status === 'read' && !challenge.bookIds.includes(b.id)
   );
+
+  const allRelevantBooks = [...associatedBooks, ...availableBooks];
 
   const radius = 60;
   const circumference = 2 * Math.PI * radius;
@@ -63,6 +94,11 @@ function ChallengeCard({ challenge, books, onUpdate }: ChallengeCardProps) {
         console.error('Failed to delete challenge:', error);
       }
     }
+  };
+
+  const handleToggleDetails = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowDetails(!showDetails);
   };
 
   return (
@@ -129,53 +165,74 @@ function ChallengeCard({ challenge, books, onUpdate }: ChallengeCardProps) {
         />
       </div>
 
-      {expanded && (
-        <div className="books-list">
-          <h4 className="books-list-title">已完成书籍</h4>
+      <div className="challenge-books-summary">
+        <div className="books-row">
           {associatedBooks.length > 0 ? (
-            <div className="books-grid-small">
-              {associatedBooks.map((book) => (
-                <img
-                  key={book.id}
-                  src={book.coverUrl || 'https://via.placeholder.com/50x70?text=📖'}
-                  alt={book.title}
-                  className="book-thumb"
-                />
-              ))}
+            associatedBooks.slice(0, 3).map((book) => (
+              <div key={book.id} className="book-item-row">
+              <img
+                src={book.coverUrl || 'https://via.placeholder.com/40x56?text=📖'}
+                alt={book.title}
+                className="book-thumb-small"
+              />
+              <span className="status-icon completed" title="已完成">✓</span>
+            </div>
+            ))
+          ) : (
+            <p style={{ color: '#7F8C8D', fontSize: '0.8rem', margin: 0 }}>暂无已完成书籍</p>
+          )}
+          {associatedBooks.length > 3 && (
+            <div className="book-item-row">
+              <span className="more-count">+{associatedBooks.length - 3}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <button
+        className="btn btn-details"
+        onClick={handleToggleDetails}
+      >
+        {showDetails ? '收起详情' : '查看详情'}
+      </button>
+
+      {showDetails && (
+        <div className="books-list">
+          <h4 className="books-list-title">挑战书籍清单</h4>
+          {allRelevantBooks.length > 0 ? (
+            <div className="books-list-vertical">
+              {allRelevantBooks.map((book) => {
+                const isCompleted = challenge.bookIds.includes(book.id);
+                return (
+                  <div key={book.id} className="book-item-vertical">
+                    <img
+                      src={book.coverUrl || 'https://via.placeholder.com/50x70?text=📖'}
+                      alt={book.title}
+                      className="book-thumb"
+                    />
+                    <div className="book-info">
+                      <p className="book-title-small">{book.title}</p>
+                      <p className="book-author-small">{book.author}</p>
+                    </div>
+                    {!isCompleted && availableBooks.some(b => b.id === book.id) ? (
+                      <button
+                        className="btn-add-book"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddBook(book.id);
+                        }}
+                      >
+                        添加
+                      </button>
+                    ) : (
+                      <span className="status-icon-large completed-icon">✓</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           ) : (
-            <p style={{ color: '#7F8C8D', fontSize: '0.875rem' }}>暂无已完成书籍</p>
-          )}
-
-          {availableBooks.length > 0 && (
-            <>
-              <h4 className="books-list-title" style={{ marginTop: '1rem' }}>
-                添加已读书籍到挑战
-              </h4>
-              <div className="books-grid-small">
-                {availableBooks.map((book) => (
-                  <img
-                    key={book.id}
-                    src={book.coverUrl || 'https://via.placeholder.com/50x70?text=📖'}
-                    alt={`添加 ${book.title}`}
-                    className="book-thumb"
-                    style={{ cursor: 'pointer', opacity: 0.6, transition: 'all 0.3s' }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddBook(book.id);
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.opacity = '1';
-                      e.currentTarget.style.transform = 'scale(1.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.opacity = '0.6';
-                      e.currentTarget.style.transform = 'scale(1)';
-                    }}
-                  />
-                ))}
-              </div>
-            </>
+            <p style={{ color: '#7F8C8D', fontSize: '0.875rem' }}>暂无书籍</p>
           )}
         </div>
       )}
