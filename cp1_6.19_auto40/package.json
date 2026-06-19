@@ -1,0 +1,12 @@
+{
+  "name": "personal-reading-shelf",
+  "version": "1.0.0",
+  "description": "Personal reading shelf and book challenge application",
+  "scripts": {
+    "dev": "concurrently \"cd backend && npm start\" \"cd frontend && npm run dev\"",
+    "install": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
