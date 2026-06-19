@@ -12,7 +12,18 @@ interface Props {
 const TicketCard = ({ booking, exhibition, visible }: Props) => {
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [gradient, setGradient] = useState('linear-gradient(135deg, #D69E2E, #B7791F)');
+  const [animVisible, setAnimVisible] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (visible) {
+      setAnimVisible(false);
+      const timer = setTimeout(() => setAnimVisible(true), 100);
+      return () => clearTimeout(timer);
+    } else {
+      setAnimVisible(false);
+    }
+  }, [visible]);
 
   useEffect(() => {
     const generateQR = async () => {
@@ -104,7 +115,7 @@ const TicketCard = ({ booking, exhibition, visible }: Props) => {
     <>
       <canvas ref={canvasRef} style={{ display: 'none' }} />
       
-      <div className={`ticket-card-wrapper ${visible ? 'visible' : ''}`}>
+      <div className={`ticket-card-wrapper ${animVisible ? 'visible' : ''}`}>
         <div className="ticket-card" style={{ background: gradient }}>
           <div className="ticket-left">
             <div className="ticket-header">

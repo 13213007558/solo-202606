@@ -151,7 +151,7 @@ const ExhibitionDetail = () => {
   const renderCalendarDays = () => {
     if (!exhibition?.dailyRemaining) return null;
     
-    const days = [];
+    const days: JSX.Element[] = [];
     const today = new Date().toISOString().split('T')[0];
     
     exhibition.dailyRemaining.forEach((day: DailyRemaining) => {
@@ -173,6 +173,21 @@ const ExhibitionDetail = () => {
         >
           <span className="day-number">{dayNum}</span>
           <span className="day-week">{'日一二三四五六'[dayOfWeek]}</span>
+          {!day.isFull && !isPast && (
+            <div className="day-progress-bar">
+              <div
+                className="day-progress-fill"
+                style={{
+                  width: `${(day.remaining / exhibition.capacity) * 100}%`,
+                  backgroundColor: day.remaining / exhibition.capacity > 0.5
+                    ? "#38B2AC"
+                    : day.remaining / exhibition.capacity > 0.2
+                      ? "#ECC94B"
+                      : "#FC8181"
+                }}
+              ></div>
+            </div>
+          )}
           {day.isFull && <span className="full-dot"></span>}
           {!day.isFull && !isPast && (
             <span className="remaining-count">剩{day.remaining}</span>

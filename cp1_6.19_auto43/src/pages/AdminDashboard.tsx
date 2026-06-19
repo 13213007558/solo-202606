@@ -28,6 +28,7 @@ const AdminDashboard = ({ user }: Props) => {
   });
   const [createError, setCreateError] = useState('');
   const [creating, setCreating] = useState(false);
+  const [bookingPage, setBookingPage] = useState(1);
 
   useEffect(() => {
     if (!user) {
@@ -147,6 +148,10 @@ const AdminDashboard = ({ user }: Props) => {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   };
 
+  const ITEMS_PER_PAGE = 10;
+  const totalBookingPages = Math.ceil(bookings.length / ITEMS_PER_PAGE);
+  const paginatedBookings = bookings.slice((bookingPage - 1) * ITEMS_PER_PAGE, bookingPage * ITEMS_PER_PAGE);
+
   const selectedExhibitionStats = stats?.exhibitionStats.find(e => e.id === selectedExhibition);
 
   if (!user) {
@@ -179,7 +184,7 @@ const AdminDashboard = ({ user }: Props) => {
         </button>
         <button
           className={`admin-tab ${activeTab === 'bookings' ? 'active' : ''}`}
-          onClick={() => setActiveTab('bookings')}
+          onClick={() => { setActiveTab('bookings'); setBookingPage(1); }}
         >
           📋 预约管理
         </button>
@@ -305,7 +310,7 @@ const AdminDashboard = ({ user }: Props) => {
                     <td colSpan={8} className="empty-row">暂无预约记录</td>
                   </tr>
                 ) : (
-                  bookings.map(booking => (
+                  paginatedBookings.map(booking => (
                     <tr key={booking.id}>
                       <td className="booking-name">{booking.name}</td>
                       <td>{booking.phone}</td>
@@ -354,6 +359,28 @@ const AdminDashboard = ({ user }: Props) => {
               </tbody>
             </table>
           </div>
+          {bookings.length > 0 && (
+            <div className="pagination">
+              <span className="pagination-info">
+                第 {(bookingPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(bookingPage * ITEMS_PER_PAGE, bookings.length)} 条，共 {bookings.length} 条
+              </span>
+              <button
+                className="pagination-btn"
+                disabled={bookingPage === 1}
+                onClick={() => setBookingPage(p => p - 1)}
+              >
+                上一页
+              </button>
+              <span className="pagination-page">{bookingPage} / {totalBookingPages}</span>
+              <button
+                className="pagination-btn"
+                disabled={bookingPage >= totalBookingPages}
+                onClick={() => setBookingPage(p => p + 1)}
+              >
+                下一页
+              </button>
+            </div>
+          )}
         </div>
       )}
 
