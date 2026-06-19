@@ -1,0 +1,19 @@
+const fs = require("fs");
+const p = "/Users/guo/Documents/solo/demo-Solo/tasks/auto48/src/components/TicketCard.tsx";
+const lines = [];
+lines.push("import React from eact\;");
+lines.push("import { QRCodeSVG } from \qrcode.react\;");
+lines.push("");
+lines.push("interface Booking {");
+lines.push("  exhibitionName: string;");
+lines.push("  date: string;");
+lines.push("  seatNumber: string;");
+lines.push("  verificationCode: string;");
+lines.push("  id: string | number;");
+lines.push("}");
+lines.push("");
+lines.push("interface TicketCardProps {");
+lines.push("  booking: Booking;");
+lines.push("  coverImage?: string;");
+lines.push("}");
+lines.push("");
