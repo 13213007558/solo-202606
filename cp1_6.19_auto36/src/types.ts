@@ -36,6 +36,13 @@ export const STATUS_COLORS: Record<ProjectStatus, { bg: string; text: string }> 
   archived: { bg: '#F59E0B', text: '#FFFFFF' },
 };
 
+export const STATUS_GRADIENTS: Record<ProjectStatus, string> = {
+  ideation: 'linear-gradient(90deg, #CBD5E1 0%, #94A3B8 100%)',
+  development: 'linear-gradient(90deg, #93C5FD 0%, #3B82F6 100%)',
+  published: 'linear-gradient(90deg, #6EE7B7 0%, #10B981 100%)',
+  archived: 'linear-gradient(90deg, #FCD34D 0%, #F59E0B 100%)',
+};
+
 export const TECH_COLORS: Record<string, string> = {
   React: '#61DAFB',
   'Node.js': '#339933',

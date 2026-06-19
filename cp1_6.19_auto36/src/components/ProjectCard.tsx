@@ -1,4 +1,5 @@
-import { Project, STATUS_COLORS, STATUS_LABELS } from '../types';
+import { useState } from 'react';
+import { Project, STATUS_COLORS, STATUS_LABELS, STATUS_GRADIENTS } from '../types';
 import { getTechColor } from '../utils';
 
 interface ProjectCardProps {
@@ -7,10 +8,32 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, onClick }: ProjectCardProps) {
+  const [tagsExpanded, setTagsExpanded] = useState(false);
+  const [descExpanded, setDescExpanded] = useState(false);
+
   const statusStyle = STATUS_COLORS[project.status];
+  const gradient = STATUS_GRADIENTS[project.status];
+  const maxVisibleTags = 3;
+  const visibleTags = tagsExpanded ? project.techStack : project.techStack.slice(0, maxVisibleTags);
+  const hiddenCount = project.techStack.length - maxVisibleTags;
+
+  const descLineHeight = 1.5;
+  const descFontSize = 14;
+  const maxDescHeight = descLineHeight * descFontSize * 2;
+
+  const handleToggleTags = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setTagsExpanded(!tagsExpanded);
+  };
+
+  const handleToggleDesc = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDescExpanded(!descExpanded);
+  };
 
   return (
     <div className="project-card" onClick={onClick}>
+      <div className="project-card-gradient-bar" style={{ background: gradient }} />
       <div className="project-card-header">
         <h3 className="project-card-title">{project.name}</h3>
         <span
@@ -20,9 +43,26 @@ export default function ProjectCard({ project, onClick }: ProjectCardProps) {
           {STATUS_LABELS[project.status]}
         </span>
       </div>
-      <p className="project-card-desc">{project.description}</p>
+      <div className="project-card-desc-wrapper">
+        <p
+          className={`project-card-desc ${descExpanded ? 'expanded' : ''}`}
+          style={{
+            maxHeight: descExpanded ? 'none' : `${maxDescHeight}px`,
+          }}
+        >
+          {project.description}
+        </p>
+        {project.description && project.description.length > 50 && (
+          <button
+            className="project-card-toggle-btn"
+            onClick={handleToggleDesc}
+          >
+            {descExpanded ? '收起' : '展开'}
+          </button>
+        )}
+      </div>
       <div className="tech-tags">
-        {project.techStack.map((tech) => (
+        {visibleTags.map((tech) => (
           <span
             key={tech}
             className="tech-tag"
@@ -31,6 +71,22 @@ export default function ProjectCard({ project, onClick }: ProjectCardProps) {
             {tech}
           </span>
         ))}
+        {hiddenCount > 0 && !tagsExpanded && (
+          <button
+            className="tech-tag tech-tag-more"
+            onClick={handleToggleTags}
+          >
+            +{hiddenCount}
+          </button>
+        )}
+        {tagsExpanded && hiddenCount > 0 && (
+          <button
+            className="tech-tag tech-tag-collapse"
+            onClick={handleToggleTags}
+          >
+            收起
+          </button>
+        )}
       </div>
       <div className="project-card-footer">
         {project.githubUrl ? (

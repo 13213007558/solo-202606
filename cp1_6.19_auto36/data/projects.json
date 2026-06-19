@@ -11,5 +11,21 @@
     "githubUrl": "https://github.com/testuser/personal-blog",
     "status": "development",
     "createdAt": "2026-06-18T23:22:52.275Z"
+  },
+  {
+    "id": "682aebe5-3640-4ef0-a304-764c8b164eae",
+    "name": "全栈电商平台",
+    "description": "一个完整的全栈电商平台，包含商品管理、购物车、订单系统、支付集成、用户认证、后台管理等功能模块。前端采用现代化组件架构，后端提供RESTful API，数据库使用PostgreSQL存储业务数据。支持多种支付方式，完善的订单跟踪系统，以及丰富的数据分析功能。",
+    "techStack": [
+      "React",
+      "Next.js",
+      "TypeScript",
+      "Tailwind",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "githubUrl": "",
+    "status": "published",
+    "createdAt": "2026-06-18T23:58:58.984Z"
   }
 ]
