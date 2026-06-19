@@ -90,6 +90,30 @@
       "status": "cancelled",
       "verificationCode": "C9R4T6",
       "seatNumber": "C05, C06, C07"
+    },
+    {
+      "id": "booking-7e86c206",
+      "exhibitionId": "exh-002",
+      "name": "测试用户",
+      "phone": "13800138000",
+      "date": "2026-07-10",
+      "count": 3,
+      "status": "pending",
+      "verificationCode": "5VQFVE",
+      "seatNumber": "E12, C03, A06",
+      "createdAt": "2026-06-18T23:53:08.248Z"
+    },
+    {
+      "id": "booking-53707fd0",
+      "exhibitionId": "exh-001",
+      "name": "测试用户",
+      "phone": "13800138000",
+      "date": "2026-07-01",
+      "count": 3,
+      "status": "pending",
+      "verificationCode": "F79KXY",
+      "seatNumber": "B16, D20, E19",
+      "createdAt": "2026-06-19T00:04:58.697Z"
     }
   ],
   "users": [
