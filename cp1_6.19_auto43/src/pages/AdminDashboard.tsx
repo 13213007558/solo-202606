@@ -64,6 +64,7 @@ const AdminDashboard = ({ user }: Props) => {
   const handleUpdateBookingStatus = async (bookingId: string, status: string) => {
     try {
       await axios.put(`/api/bookings/${bookingId}/status`, { status });
+      setBookingPage(1);
       fetchData();
     } catch (err) {
       console.error('Failed to update booking status:', err);
@@ -122,6 +123,7 @@ const AdminDashboard = ({ user }: Props) => {
       });
       
       setActiveTab('exhibitions');
+      setBookingPage(1);
       fetchData();
     } catch (err: any) {
       setCreateError(err.response?.data?.error || '创建失败');

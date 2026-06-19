@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import QRCode from 'qrcode';
 import type { Booking, Exhibition } from '../types';
 import './TicketCard.css';
@@ -14,6 +15,7 @@ const TicketCard = ({ booking, exhibition, visible }: Props) => {
   const [gradient, setGradient] = useState('linear-gradient(135deg, #D69E2E, #B7791F)');
   const [animVisible, setAnimVisible] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const location = useLocation();
 
   useEffect(() => {
     if (visible) {
@@ -24,6 +26,23 @@ const TicketCard = ({ booking, exhibition, visible }: Props) => {
       setAnimVisible(false);
     }
   }, [visible]);
+
+  useEffect(() => {
+    setAnimVisible(false);
+    const timer = setTimeout(() => setAnimVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, [location]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        setAnimVisible(false);
+        setTimeout(() => setAnimVisible(true), 100);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
 
   useEffect(() => {
     const generateQR = async () => {
