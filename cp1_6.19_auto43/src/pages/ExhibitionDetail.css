@@ -1,0 +1,536 @@
+.detail-page {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.detail-carousel {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 32px;
+  aspect-ratio: 21 / 9;
+  background-color: #2D3748;
+}
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.carousel-slide.active {
+  opacity: 1;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.carousel-dot.active {
+  background: #D69E2E;
+  width: 28px;
+  border-radius: 5px;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+  z-index: 10;
+}
+
+.carousel-nav:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.carousel-nav.prev {
+  left: 20px;
+}
+
+.carousel-nav.next {
+  right: 20px;
+}
+
+.detail-content {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 32px;
+  align-items: start;
+}
+
+.detail-main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.detail-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #F7FAFC;
+  line-height: 1.3;
+}
+
+.detail-status {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.detail-status.status-upcoming {
+  background: rgba(66, 153, 225, 0.2);
+  color: #63B3ED;
+}
+
+.detail-status.status-ongoing {
+  background: rgba(56, 178, 172, 0.2);
+  color: #4FD1C5;
+}
+
+.detail-status.status-ended {
+  background: rgba(113, 128, 150, 0.2);
+  color: #A0AEC0;
+}
+
+.detail-meta {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #A0AEC0;
+  font-size: 15px;
+}
+
+.meta-icon {
+  font-size: 18px;
+}
+
+.countdown-section {
+  text-align: center;
+}
+
+.countdown-title {
+  color: #A0AEC0;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.countdown-timer {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.countdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.countdown-number {
+  font-size: 36px;
+  font-weight: 700;
+  color: #D69E2E;
+  font-family: 'Courier New', monospace;
+  min-width: 50px;
+}
+
+.countdown-label {
+  font-size: 12px;
+  color: #718096;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F7FAFC;
+  margin-bottom: 16px;
+}
+
+.description-text {
+  color: #A0AEC0;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.date-picker-section {
+  margin-bottom: 0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: #1A202C;
+  border: 2px solid transparent;
+  color: #E2E8F0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  padding: 4px;
+}
+
+.calendar-day:hover:not(.disabled) {
+  border-color: #D69E2E;
+  background: #2D3748;
+}
+
+.calendar-day.selected {
+  background: linear-gradient(135deg, #D69E2E, #B7791F);
+  color: #1A202C;
+  border-color: #D69E2E;
+}
+
+.calendar-day.selected .remaining-count,
+.calendar-day.selected .day-week {
+  color: #2D3748;
+}
+
+.calendar-day.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.calendar-day.full .day-number {
+  color: #FC8181;
+}
+
+.calendar-day.today {
+  border-color: #38B2AC;
+}
+
+.day-number {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.day-week {
+  font-size: 11px;
+  color: #718096;
+  margin-top: 2px;
+}
+
+.full-dot {
+  position: absolute;
+  bottom: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FC8181;
+}
+
+.remaining-count {
+  font-size: 10px;
+  color: #38B2AC;
+  margin-top: 2px;
+}
+
+.selected-date-info {
+  text-align: center;
+  color: #A0AEC0;
+  font-size: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #4A5568;
+}
+
+.selected-date-info .highlight {
+  color: #D69E2E;
+  font-weight: 600;
+}
+
+.detail-sidebar {
+  position: sticky;
+  top: 96px;
+}
+
+.booking-form {
+  position: relative;
+}
+
+.form-error-banner {
+  background: rgba(252, 129, 129, 0.1);
+  border: 1px solid rgba(252, 129, 129, 0.3);
+  color: #FC8181;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.ticket-counter {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.counter-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #1A202C;
+  color: #D69E2E;
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  border: 1px solid #4A5568;
+}
+
+.counter-btn:hover {
+  background: #2D3748;
+  border-color: #D69E2E;
+}
+
+.counter-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F7FAFC;
+  min-width: 30px;
+  text-align: center;
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.form-tip {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #4A5568;
+  color: #718096;
+  font-size: 13px;
+  text-align: center;
+}
+
+.hint {
+  color: #718096;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.error-box {
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.error-text {
+  color: #FC8181;
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.ticket-success-section {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #38B2AC, #319795);
+  color: white;
+  font-size: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.success-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #F7FAFC;
+  margin-bottom: 8px;
+}
+
+.success-subtitle {
+  color: #A0AEC0;
+  margin-bottom: 32px;
+}
+
+.ticket-display {
+  margin-bottom: 32px;
+}
+
+.success-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .detail-content {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .detail-carousel {
+    border-radius: 0;
+    margin: -20px -16px 24px;
+    aspect-ratio: 16 / 10;
+  }
+
+  .carousel-nav {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+
+  .carousel-nav.prev {
+    left: 10px;
+  }
+
+  .carousel-nav.next {
+    right: 10px;
+  }
+
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .detail-title {
+    font-size: 24px;
+  }
+
+  .detail-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .countdown-number {
+    font-size: 28px;
+    min-width: 40px;
+  }
+
+  .countdown-timer {
+    gap: 12px;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .calendar-day {
+    padding: 2px;
+  }
+
+  .day-number {
+    font-size: 14px;
+  }
+
+  .day-week {
+    font-size: 10px;
+  }
+
+  .remaining-count {
+    font-size: 9px;
+  }
+
+  .full-dot {
+    width: 4px;
+    height: 4px;
+    bottom: 4px;
+  }
+
+  .success-actions {
+    flex-direction: column;
+  }
+
+  .success-actions .btn {
+    width: 100%;
+  }
+}

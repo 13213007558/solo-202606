@@ -1,0 +1,111 @@
+{
+  "exhibitions": [
+    {
+      "id": "exh-001",
+      "name": "印象派大师展",
+      "startDate": "2026-05-01",
+      "endDate": "2026-07-31",
+      "capacity": 100,
+      "description": "本次展览汇集了莫奈、雷诺阿、德加等印象派大师的珍贵作品，带您领略19世纪法国艺术的璀璨光芒。通过光影与色彩的交融，感受印象派画家们对自然与生活的独特诠释。展览共分为五个主题展区，涵盖风景画、人物画、静物画等多个门类。",
+      "coverImage": "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=800&h=600&fit=crop",
+      "images": [
+        "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=1200&h=800&fit=crop",
+        "https://images.unsplash.com/photo-1577720643272-265f09367456?w=1200&h=800&fit=crop",
+        "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1200&h=800&fit=crop"
+      ],
+      "createdAt": "2026-04-01T00:00:00.000Z"
+    },
+    {
+      "id": "exh-002",
+      "name": "古代文明探秘",
+      "startDate": "2026-06-15",
+      "endDate": "2026-09-15",
+      "capacity": 80,
+      "description": "探索古埃及、古希腊、古罗马和古代中国四大文明的珍贵文物，穿越时空感受人类历史的辉煌篇章。展览展出超过200件珍贵文物，包括木乃伊、青铜器、雕塑和古籍等。",
+      "coverImage": "https://images.unsplash.com/photo-1584037618688-1a85c09fa9f0?w=800&h=600&fit=crop",
+      "images": [
+        "https://images.unsplash.com/photo-1584037618688-1a85c09fa9f0?w=1200&h=800&fit=crop",
+        "https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=1200&h=800&fit=crop",
+        "https://images.unsplash.com/photo-1590673846749-e2fb8f655df1?w=1200&h=800&fit=crop"
+      ],
+      "createdAt": "2026-05-01T00:00:00.000Z"
+    },
+    {
+      "id": "exh-003",
+      "name": "当代艺术先锋展",
+      "startDate": "2026-07-01",
+      "endDate": "2026-08-31",
+      "capacity": 60,
+      "description": "汇集全球顶尖当代艺术家的先锋作品，探索艺术与科技的边界，体验沉浸式的视觉盛宴。展览包含装置艺术、数字艺术、行为艺术等多种形式。",
+      "coverImage": "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=800&h=600&fit=crop",
+      "images": [
+        "https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=1200&h=800&fit=crop",
+        "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1200&h=800&fit=crop",
+        "https://images.unsplash.com/photo-1549490349-8643362247b5?w=1200&h=800&fit=crop"
+      ],
+      "createdAt": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "exh-004",
+      "name": "自然摄影之旅",
+      "startDate": "2026-04-01",
+      "endDate": "2026-06-30",
+      "capacity": 120,
+      "description": "跟随世界顶级自然摄影师的镜头，探索地球各个角落的壮丽风光与珍稀野生动物。展出作品来自全球50多位摄影师，涵盖极地、雨林、沙漠等多种生态环境。",
+      "coverImage": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop",
+      "images": [
+        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&h=800&fit=crop",
+        "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&h=800&fit=crop",
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&h=800&fit=crop"
+      ],
+      "createdAt": "2026-03-01T00:00:00.000Z"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "book-001",
+      "exhibitionId": "exh-001",
+      "name": "张三",
+      "phone": "13800138001",
+      "date": "2026-06-20",
+      "tickets": 2,
+      "seatNumbers": ["A-015", "A-016"],
+      "verificationCode": "IMP20260620001",
+      "status": "confirmed",
+      "createdAt": "2026-06-10T10:30:00.000Z"
+    },
+    {
+      "id": "book-002",
+      "exhibitionId": "exh-001",
+      "name": "李四",
+      "phone": "13900139002",
+      "date": "2026-06-20",
+      "tickets": 1,
+      "seatNumbers": ["B-023"],
+      "verificationCode": "IMP20260620002",
+      "status": "pending",
+      "createdAt": "2026-06-12T14:20:00.000Z"
+    },
+    {
+      "id": "book-003",
+      "exhibitionId": "exh-002",
+      "name": "王五",
+      "phone": "13700137003",
+      "date": "2026-06-25",
+      "tickets": 3,
+      "seatNumbers": ["C-008", "C-009", "C-010"],
+      "verificationCode": "CIV20260625001",
+      "status": "confirmed",
+      "createdAt": "2026-06-15T09:15:00.000Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "user-001",
+      "username": "admin",
+      "password": "admin123",
+      "role": "admin",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ]
+}
