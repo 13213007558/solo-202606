@@ -88,3 +88,39 @@ const techColors: Record<string, string> = {
                 <label className="form-label">今日心情</label>
                 <div className="mood-selector">
                   {MOODS.map((m) => (
+        {logs.length === 0 ? (
+          <div className="card empty-state">
+            <div className="empty-state-icon">📝</div>
+            <div className="empty-state-text">还没有开发日志，点击"新增日志"开始记录</div>
+          </div>
+        ) : (
+          <div className="timeline">
+            {logs.map((log, index) => (
+              <div key={log.id} className="timeline-item" style={{animationDelay: `${index * 0.05}s`}}>
+                <div className={`timeline-dot mood-${log.mood}`}></div>
+                <div className="timeline-content">
+                  <div className="timeline-top">
+                    <div>
+                      <div className="timeline-date">📅 {new Date(log.date).toLocaleDateString("zh-CN")}</div>
+                      <div className="timeline-title">{log.title}</div>
+                    </div>
+                    <div style={{display: "flex", alignItems: "center", gap: 12}}>
+                      <span className="timeline-mood">{log.mood}</span>
+                      <div className="timeline-actions">
+                        <button className="btn-secondary" onClick={() => startEdit(log)}>编辑</button>
+                        <button className="btn-danger" onClick={() => handleDeleteLog(log.id)}>删除</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="timeline-body">{renderMarkdown(log.content)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ProjectDetailPage;
