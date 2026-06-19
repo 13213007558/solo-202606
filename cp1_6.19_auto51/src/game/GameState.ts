@@ -1,1 +1,1 @@
-import { eventBus } from "../core/Event
+%s

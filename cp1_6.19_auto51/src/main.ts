@@ -27,8 +27,6 @@ class AudioManager {
 
     osc.frequency.value = freq;
     osc.type = "sine";
-  }
-
     gain.gain.setValueAtTime(vol, this.audioContext.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + dur);
 
@@ -129,6 +127,7 @@ class GameScene extends Phaser.Scene {
   private playerCount: number = 2;
   private paddleY: number[] = [];
   private paddleMoving: boolean[][] = [];
+  private isPaused: boolean = false;
 
   constructor() {
     super("GameScene");
@@ -179,13 +178,18 @@ class GameScene extends Phaser.Scene {
     eventBus.on("gameStateChange", (state: any) => {
       if (state.gameStatus === "gameOver" && state.winner !== null) {
         ballPhysics.stop();
-        gameRenderer.showGameOver(state.winner);
+        this.isPaused = true;
         audioManager.playWin();
+        gameRenderer.showGameOver(state.winner, () => {
+          this.resetGame();
+        });
       }
+    });
     });
   }
 
   private handleInput(playerId: number, action: string): void {
+    if (this.isPaused) return;
     if (playerId < 0 || playerId >= this.playerCount) return;
 
     if (action === "moveUp") {
@@ -200,6 +204,7 @@ class GameScene extends Phaser.Scene {
   }
 
   public update(_time: number, delta: number): void {
+    if (this.isPaused) return;
     if (gameState.getGameStatus() !== "playing") return;
 
     const dt = delta / 1000;
@@ -220,6 +225,15 @@ class GameScene extends Phaser.Scene {
     }
 
     ballPhysics.update(delta);
+  }
+
+  private resetGame(): void {
+    gameState.init(this.playerCount);
+    ballPhysics.resetBall();
+    gameRenderer.reset();
+    this.isPaused = false;
+    gameState.startGame();
+    ballPhysics.start();
   }
 }
 

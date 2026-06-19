@@ -34,6 +34,11 @@ export class InputManager {
     return InputManager.instance;
   }
 
+
+  public init(playerCount: number): void {
+    this.setPlayerCount(playerCount);
+    this.startListening();
+  }
   public setPlayerCount(count: number): void {
     if (count < 2 || count > 4) {
       throw new Error("Player count must be between 2 and 4");
