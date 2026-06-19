@@ -598,6 +598,8 @@ const futureDate3Days = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
 const futureDate5Days = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
 const pastStartDate = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
 const pastEndDate = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
+const pastEndDate2 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+const pastEndDate3 = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
 export const challenges: Challenge[] = [
   {
@@ -661,5 +663,21 @@ export const trophies: Trophy[] = [
     challengeTitle: '家常菜大赛',
     rank: 'third',
     awardedAt: pastEndDate.toISOString(),
+  },
+  {
+    id: 'trophy-4',
+    userId: 'user-1',
+    challengeId: 'challenge-old-1',
+    challengeTitle: '首届甜品大赛',
+    rank: 'first',
+    awardedAt: pastEndDate2.toISOString(),
+  },
+  {
+    id: 'trophy-5',
+    userId: 'user-1',
+    challengeId: 'challenge-old-2',
+    challengeTitle: '春季创意菜',
+    rank: 'third',
+    awardedAt: pastEndDate3.toISOString(),
   },
 ];
