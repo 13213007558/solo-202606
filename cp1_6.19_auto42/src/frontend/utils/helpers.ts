@@ -31,9 +31,9 @@ export const getProgressColor = (progress: number): string => {
 }
 
 export const getDonationCardColor = (amount: number): string => {
-  if (amount >= 100) return '#FFF3CD'
-  if (amount >= 50) return '#D4EDDA'
-  return '#CCE5FF'
+  if (amount >= 100) return '#FEF3C7'
+  if (amount >= 50) return '#BBF7D0'
+  return '#DBEAFE'
 }
 
 export const truncateText = (text: string, maxLength: number): string => {

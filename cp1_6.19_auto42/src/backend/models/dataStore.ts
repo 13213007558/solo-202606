@@ -117,7 +117,11 @@ export const dataStore = {
       '孩子们的笑容是我们最大的动力。',
       '公益路上，你我同行。',
       '用爱心点亮希望之光。',
-      '感谢每一位善良的捐赠者！'
+      '感谢每一位善良的捐赠者！',
+      '加油！',
+      '支持！',
+      '爱心无大小，善举暖人心。希望更多人加入进来，一起为美好未来贡献力量！',
+      '每一滴水都能折射太阳的光芒，每一份爱心都能温暖一个角落。让我们携手同行，用行动证明这个世界的美好！'
     ]
     const mockNames = ['张三', '李四', '王五', '赵六', '陈七', '周八', '吴九', '郑十', '爱心人士', '匿名用户']
     const mockAmounts = [10, 50, 100, 200, 50, 10, 100, 50, 10, 200]
@@ -125,7 +129,8 @@ export const dataStore = {
     store.activities.forEach(activity => {
       for (let i = 0; i < 15; i++) {
         const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)]
-        const mockDonation: Omit<Donation, 'id' | 'createdAt'> = {
+        store.donations.push({
+          id: uuidv4(),
           activityId: activity.id,
           userId: `user${Math.floor(Math.random() * 1000)}`,
           userName: mockNames[Math.floor(Math.random() * mockNames.length)],
@@ -133,8 +138,7 @@ export const dataStore = {
           amount: mockAmounts[Math.floor(Math.random() * mockAmounts.length)],
           message: mockMessages[Math.floor(Math.random() * mockMessages.length)],
           createdAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
-        }
-        dataStore.createDonation(mockDonation)
+        })
       }
     })
   }
