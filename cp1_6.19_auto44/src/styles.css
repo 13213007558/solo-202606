@@ -1,0 +1,1592 @@
+:root {
+  --bg-primary: #fff8e7;
+  --bg-secondary: #fffaf0;
+  --accent-primary: #4a7c59;
+  --accent-secondary: #e07a5f;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-light: #999999;
+  --card-bg: #ffffff;
+  --border-color: #eeeeee;
+  --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.15);
+  --radius-card: 16px;
+  --radius-input: 8px;
+  --radius-button: 8px;
+  --gradient-gold: linear-gradient(135deg, #ffd700 0%, #ffb347 50%, #ff8c00 100%);
+  --gradient-silver: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 50%, #a8a8a8 100%);
+  --gradient-bronze: linear-gradient(135deg, #d29667 0%, #b87333 50%, #8b4513 100%);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
+    'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+/* ========== 导航栏 ========== */
+.navbar {
+  background: var(--accent-primary);
+  color: #fff;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(74, 124, 89, 0.3);
+}
+
+.navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-logo {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-logo-icon {
+  font-size: 26px;
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-link {
+  color: rgba(255, 255, 255, 0.9);
+  padding: 8px 16px;
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.navbar-link:hover,
+.navbar-link.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: #fff;
+}
+
+.navbar-btn {
+  background: var(--accent-secondary);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--radius-button);
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.navbar-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(224, 122, 95, 0.4);
+}
+
+.hamburger {
+  display: none;
+  font-size: 24px;
+  color: #fff;
+  padding: 4px 8px;
+}
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mobile-menu.open {
+  display: flex;
+}
+
+.mobile-menu .navbar-link {
+  padding: 12px 20px;
+  border-radius: 0;
+}
+
+/* ========== 通用按钮 ========== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #3e6a4b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);
+}
+
+.btn-accent {
+  background: var(--accent-secondary);
+  color: #fff;
+}
+
+.btn-accent:hover {
+  background: #cc6a50;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--accent-primary);
+  border: 2px solid var(--accent-primary);
+  padding: 8px 20px;
+}
+
+.btn-outline:hover {
+  background: var(--accent-primary);
+  color: #fff;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* ========== 输入框 ========== */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-input);
+  background: var(--bg-secondary);
+  font-size: 15px;
+  color: var(--text-primary);
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.15);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.7;
+}
+
+/* ========== 卡片 ========== */
+.recipe-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.recipe-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+}
+
+.recipe-card-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5e6c8, #e8d5a8);
+}
+
+.recipe-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.recipe-card:hover .recipe-card-image img {
+  transform: scale(1.05);
+}
+
+.recipe-card-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recipe-card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.recipe-card-author {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.recipe-card-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.recipe-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ingredient-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 14px;
+  color: #fff;
+  background: var(--accent-secondary);
+}
+
+.recipe-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: transparent;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.like-btn:hover {
+  background: rgba(224, 122, 95, 0.1);
+}
+
+.heart-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.heart-icon.liked {
+  fill: var(--accent-secondary);
+  color: var(--accent-secondary);
+}
+
+.heart-icon.unliked {
+  fill: none;
+  stroke: var(--text-light);
+  stroke-width: 2;
+  color: var(--text-light);
+}
+
+.heart-bounce {
+  animation: heartBounce 0.5s ease;
+}
+
+@keyframes heartBounce {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.4);
+  }
+  60% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.like-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.like-count.liked {
+  color: var(--accent-secondary);
+}
+
+/* ========== 菜谱网格 ========== */
+.recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* ========== 搜索框 ========== */
+.search-wrapper {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto 32px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 20px 14px 48px;
+  font-size: 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 50px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-light);
+}
+
+.search-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 5px rgba(74, 124, 89, 0.18), 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-hover);
+  overflow: hidden;
+  z-index: 50;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.search-suggestion-item {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.search-suggestion-item:hover {
+  background: var(--bg-secondary);
+}
+
+.search-suggestion-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--bg-secondary);
+}
+
+.search-suggestion-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-suggestion-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-suggestion-desc {
+  font-size: 13px;
+  color: var(--text-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========== 当前挑战卡片 ========== */
+.challenge-banner {
+  background: linear-gradient(135deg, #4a7c59 0%, #5d9272 50%, #72a888 100%);
+  border-radius: var(--radius-card);
+  padding: 28px 32px;
+  color: #fff;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-light);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.challenge-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(
+    circle,
+    rgba(224, 122, 95, 0.3) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+}
+
+.challenge-banner:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.challenge-banner-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.challenge-banner-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-secondary);
+  padding: 4px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.challenge-banner-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.challenge-banner-desc {
+  font-size: 15px;
+  opacity: 0.92;
+  max-width: 500px;
+}
+
+.countdown-box {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  padding: 16px 28px;
+  border-radius: var(--radius-card);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.countdown-number {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.countdown-label {
+  font-size: 13px;
+  margin-top: 4px;
+  opacity: 0.9;
+  letter-spacing: 2px;
+}
+
+/* ========== 页面标题 ========== */
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 24px;
+  background: var(--accent-secondary);
+  border-radius: 3px;
+}
+
+/* ========== 认证页面 ========== */
+.auth-wrapper {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: linear-gradient(
+      135deg,
+      rgba(74, 124, 89, 0.08) 0%,
+      rgba(224, 122, 95, 0.08) 100%
+    ),
+    var(--bg-primary);
+}
+
+.auth-card {
+  background: var(--card-bg);
+  border-radius: 24px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-light);
+}
+
+.auth-card h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.auth-card p.subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+  font-size: 14px;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.auth-footer a {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.auth-error {
+  background: rgba(224, 122, 95, 0.1);
+  color: var(--accent-secondary);
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.auth-success {
+  background: rgba(74, 124, 89, 0.1);
+  color: var(--accent-primary);
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+/* ========== 个人档案 ========== */
+.profile-header {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-light);
+  flex-wrap: wrap;
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid var(--accent-primary);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 220px;
+}
+
+.profile-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.profile-bio {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.profile-meta {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.profile-section {
+  margin-bottom: 36px;
+}
+
+/* ========== 奖杯展示 ========== */
+.trophies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.trophy-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  padding: 24px 16px;
+  text-align: center;
+  box-shadow: var(--shadow-light);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.trophy-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.trophy-card.gold {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 140, 0, 0.06));
+}
+
+.trophy-card.silver {
+  background: linear-gradient(135deg, rgba(232, 232, 232, 0.15), rgba(192, 192, 192, 0.08));
+}
+
+.trophy-card.bronze {
+  background: linear-gradient(135deg, rgba(210, 150, 103, 0.12), rgba(139, 69, 19, 0.06));
+}
+
+.trophy-svg {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 12px;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.trophy-card:hover .trophy-svg {
+  animation: trophyGlow 1.2s ease;
+}
+
+@keyframes trophyGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.8))
+      drop-shadow(0 0 32px rgba(255, 200, 0, 0.4));
+  }
+}
+
+.trophy-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.trophy-rank {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.trophy-rank.gold {
+  background: var(--gradient-gold);
+}
+
+.trophy-rank.silver {
+  background: var(--gradient-silver);
+  color: #444;
+}
+
+.trophy-rank.bronze {
+  background: var(--gradient-bronze);
+}
+
+.trophy-date {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.trophies-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-light);
+}
+
+/* ========== 菜谱详情页 ========== */
+.recipe-detail {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-light);
+}
+
+.recipe-detail-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5e6c8, #e8d5a8);
+}
+
+.recipe-detail-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recipe-detail-content {
+  padding: 32px;
+}
+
+.recipe-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.recipe-detail-title {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.recipe-detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.recipe-detail-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recipe-detail-author img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.recipe-detail-desc {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  padding: 20px 24px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-input);
+  margin: 24px 0;
+  border-left: 4px solid var(--accent-secondary);
+}
+
+.detail-section {
+  margin: 32px 0;
+}
+
+.detail-section h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ingredients-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.ingredient-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-input);
+  border-left: 3px solid var(--accent-secondary);
+}
+
+.ingredient-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ingredient-amount {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.step-item {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-input);
+}
+
+.step-number {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-desc {
+  flex: 1;
+  font-size: 15px;
+  color: var(--text-primary);
+  line-height: 1.8;
+  padding-top: 6px;
+}
+
+/* ========== 挑战详情页 ========== */
+.challenge-detail-hero {
+  background: linear-gradient(135deg, #4a7c59 0%, #5d9272 100%);
+  color: #fff;
+  border-radius: var(--radius-card);
+  padding: 36px 40px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.winners-banner {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.winner-card {
+  flex: 1;
+  min-width: 200px;
+  padding: 20px;
+  border-radius: var(--radius-card);
+  text-align: center;
+  color: #333;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.6s ease backwards;
+}
+
+.winner-card:nth-child(1) {
+  background: var(--gradient-gold);
+  animation-delay: 0.1s;
+}
+
+.winner-card:nth-child(2) {
+  background: var(--gradient-silver);
+  animation-delay: 0.25s;
+}
+
+.winner-card:nth-child(3) {
+  background: var(--gradient-bronze);
+  color: #fff;
+  animation-delay: 0.4s;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.winner-trophy {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.winner-rank {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.winner-username {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.challenge-detail-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.challenge-detail-desc {
+  font-size: 16px;
+  opacity: 0.95;
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.challenge-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.challenge-rules {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  padding: 24px 28px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-light);
+}
+
+.challenge-rules h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+
+.challenge-rules pre {
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+}
+
+.participate-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* ========== 弹窗 ========== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-hover);
+  animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  font-size: 20px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.recipe-select-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.recipe-select-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-input);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recipe-select-item:hover {
+  border-color: var(--accent-primary);
+  background: rgba(74, 124, 89, 0.04);
+}
+
+.recipe-select-item.selected {
+  border-color: var(--accent-primary);
+  background: rgba(74, 124, 89, 0.1);
+}
+
+.recipe-select-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.recipe-select-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.recipe-select-name {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.recipe-select-desc {
+  font-size: 13px;
+  color: var(--text-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-empty {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-light);
+  font-size: 15px;
+}
+
+/* ========== 新建/编辑菜谱表单 ========== */
+.recipe-form {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  padding: 32px;
+  box-shadow: var(--shadow-light);
+}
+
+.ingredient-row,
+.step-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: stretch;
+}
+
+.ingredient-row .form-input {
+  flex: 1;
+}
+
+.delete-row-btn {
+  width: 42px;
+  min-width: 42px;
+  border-radius: var(--radius-input);
+  background: #fee;
+  color: #e74c3c;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.delete-row-btn:hover {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.add-row-btn {
+  width: 100%;
+  padding: 10px;
+  border: 2px dashed var(--accent-primary);
+  border-radius: var(--radius-input);
+  color: var(--accent-primary);
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.add-row-btn:hover {
+  background: rgba(74, 124, 89, 0.06);
+  border-color: #3e6a4b;
+}
+
+.step-order {
+  width: 42px;
+  min-width: 42px;
+  border-radius: var(--radius-input);
+  background: var(--accent-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+}
+
+.step-order:active {
+  cursor: grabbing;
+}
+
+.step-row.dragging {
+  opacity: 0.5;
+}
+
+.step-row.drag-over {
+  border: 2px dashed var(--accent-primary);
+  border-radius: var(--radius-input);
+  padding: 2px;
+}
+
+.step-desc-input {
+  flex: 1;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.my-recipes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* ========== 加载/空状态 ========== */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-light);
+  font-size: 15px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-light);
+}
+
+.empty-state-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+/* ========== Toast 提示 ========== */
+.toast {
+  position: fixed;
+  top: 90px;
+  right: 24px;
+  padding: 12px 20px;
+  border-radius: var(--radius-input);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-hover);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 2000;
+  animation: toastIn 0.25s ease;
+  max-width: 320px;
+}
+
+.toast.success {
+  border-left: 4px solid var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.toast.error {
+  border-left: 4px solid #e74c3c;
+  color: #e74c3c;
+}
+
+.toast.info {
+  border-left: 4px solid #3498db;
+  color: #3498db;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 750px) {
+  .container {
+    padding: 16px 14px;
+  }
+
+  .navbar {
+    padding: 0 16px;
+  }
+
+  .navbar-menu {
+    display: none;
+  }
+
+  .navbar-user .navbar-link {
+    display: none;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .recipes-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .trophies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .challenge-banner {
+    padding: 20px;
+  }
+
+  .challenge-banner-title {
+    font-size: 20px;
+  }
+
+  .countdown-box {
+    padding: 12px 20px;
+  }
+
+  .countdown-number {
+    font-size: 32px;
+  }
+
+  .challenge-banner-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-header {
+    padding: 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-meta {
+    justify-content: center;
+  }
+
+  .recipe-detail-content {
+    padding: 20px;
+  }
+
+  .recipe-detail-title {
+    font-size: 22px;
+  }
+
+  .ingredients-list {
+    grid-template-columns: 1fr;
+  }
+
+  .challenge-detail-hero {
+    padding: 24px;
+  }
+
+  .challenge-detail-title {
+    font-size: 22px;
+  }
+
+  .winners-banner {
+    flex-direction: column;
+  }
+
+  .winner-card {
+    min-width: unset;
+  }
+
+  .recipe-form {
+    padding: 20px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+
+  .toast {
+    left: 16px;
+    right: 16px;
+    max-width: unset;
+  }
+
+  .auth-card {
+    padding: 28px 22px;
+  }
+}
