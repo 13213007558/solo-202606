@@ -636,19 +636,21 @@ input, textarea {
 }
 
 .donation-wall.masonry {
-  column-count: 3;
+  columns: 3;
   column-gap: 1rem;
+  orphans: 1;
+  widows: 1;
 }
 
 @media (max-width: 1024px) {
   .donation-wall.masonry {
-    column-count: 2;
+    columns: 2;
   }
 }
 
 @media (max-width: 640px) {
   .donation-wall.masonry {
-    column-count: 1;
+    columns: 1;
   }
 }
 
@@ -669,7 +671,10 @@ input, textarea {
 }
 
 .donation-card.masonry {
+  break-inside: avoid;
   margin-bottom: 1rem;
+  min-height: auto;
+  height: auto;
 }
 
 .donation-card.animation-done {
@@ -730,6 +735,8 @@ input, textarea {
 
 .donation-message.masonry {
   display: block;
+  overflow: visible;
+  white-space: pre-wrap;
 }
 
 .form-container {

@@ -37,7 +37,8 @@ const DonationCard = ({ donation, viewMode, index }: DonationCardProps) => {
     transform: show ? 'translateX(0) rotate(0deg) scale(1)' : 'translateX(100px) rotate(-10deg) scale(0.8)',
     opacity: show ? 1 : 0,
     transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-    willChange: 'transform, opacity'
+    willChange: 'transform, opacity',
+    ...(viewMode === 'masonry' ? { minHeight: 'auto', height: 'auto' } : {})
   }
 
   const displayMessage = viewMode === 'grid'
