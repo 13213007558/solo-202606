@@ -1,0 +1,17 @@
+{
+  "name": "party-tennis",
+  "version": "1.0.0",
+  "description": "A local multiplayer party tennis game built with Phaser 3 and TypeScript",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "phaser": "3.80.1"
+  },
+  "devDependencies": {
+    "typescript": "5.4",
+    "vite": "5.4"
+  }
+}
