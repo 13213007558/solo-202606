@@ -449,9 +449,9 @@ export default function ProjectDetailPage() {
         {logs.map((log, idx) => (
           <div
             key={log.id}
-            className="log-card-animate"
+            className="log-card-slide-in"
             style={{
-              animationDelay: `${idx * 0.08}s`,
+              animationDelay: `${idx * 0.1}s`,
               position: 'relative',
               paddingLeft: '32px',
               marginBottom: '16px',

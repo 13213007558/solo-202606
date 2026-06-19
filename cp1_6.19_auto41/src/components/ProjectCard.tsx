@@ -42,6 +42,7 @@ export default function ProjectCard({ project }: { project: Project }) {
       style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
     >
       <div
+        className="project-card"
         style={{
           background: '#fff',
           borderRadius: '12px',
@@ -51,14 +52,6 @@ export default function ProjectCard({ project }: { project: Project }) {
           cursor: 'pointer',
           border: '1px solid #F1F5F9',
           position: 'relative',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-8px)';
-          e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.12)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)';
         }}
       >
         <div

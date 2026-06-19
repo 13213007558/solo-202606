@@ -124,8 +124,12 @@ export default function HomePage({ showProjects }: { showProjects?: boolean }) {
 
   const activeProjects = projects.filter((p) => p.status === '开发中').length;
   const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  const logsThisMonth = logs.filter((l) => l.createdAt >= monthStart).length;
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const logsThisMonth = logs.filter((l) => {
+    const logDate = new Date(l.date);
+    return logDate.getFullYear() === currentYear && logDate.getMonth() === currentMonth;
+  }).length;
 
   const recentLogs = [...logs]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
