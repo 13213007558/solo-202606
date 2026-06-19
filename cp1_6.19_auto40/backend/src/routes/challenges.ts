@@ -27,7 +27,7 @@ let challenges: Challenge[] = [
     id: uuidv4(),
     name: '年度阅读计划',
     targetBooks: 24,
-    deadline: '2025-12-31',
+    deadline: '2026-12-31',
     createdAt: new Date().toISOString(),
     bookIds: [],
     completedBookIds: []

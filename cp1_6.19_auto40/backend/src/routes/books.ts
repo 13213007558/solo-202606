@@ -12,8 +12,8 @@ let books: Book[] = [
     coverUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sci-fi%20book%20cover%20three%20body%20problem%20space&image_size=square',
     totalPages: 302,
     status: 'finished',
-    startDate: '2025-01-15',
-    endDate: '2025-02-10',
+    startDate: '2026-01-15',
+    endDate: '2026-02-10',
     rating: 5,
     currentPage: 302
   },
@@ -24,7 +24,7 @@ let books: Book[] = [
     coverUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=literary%20book%20cover%20to%20live%20chinese%20countryside&image_size=square',
     totalPages: 191,
     status: 'reading',
-    startDate: '2025-06-01',
+    startDate: '2026-06-01',
     currentPage: 120
   },
   {
@@ -43,8 +43,8 @@ let books: Book[] = [
     coverUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=history%20book%20cover%20sapiens%20human%20evolution&image_size=square',
     totalPages: 440,
     status: 'finished',
-    startDate: '2025-03-01',
-    endDate: '2025-04-15',
+    startDate: '2026-03-01',
+    endDate: '2026-04-15',
     rating: 4,
     currentPage: 440
   },
@@ -55,8 +55,8 @@ let books: Book[] = [
     coverUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=the%20little%20prince%20book%20cover%20stars%20planet&image_size=square',
     totalPages: 96,
     status: 'finished',
-    startDate: '2025-05-01',
-    endDate: '2025-05-05',
+    startDate: '2026-05-01',
+    endDate: '2026-05-05',
     rating: 5,
     currentPage: 96
   },
@@ -76,7 +76,7 @@ let books: Book[] = [
     coverUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=philosophy%20book%20cover%20courage%20to%20be%20disliked&image_size=square',
     totalPages: 288,
     status: 'reading',
-    startDate: '2025-06-10',
+    startDate: '2026-06-10',
     currentPage: 150
   },
   {
@@ -86,8 +86,8 @@ let books: Book[] = [
     coverUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chinese%20literature%20book%20cover%20fortress%20besieged&image_size=square',
     totalPages: 359,
     status: 'finished',
-    startDate: '2025-02-15',
-    endDate: '2025-03-20',
+    startDate: '2026-02-15',
+    endDate: '2026-03-20',
     rating: 4,
     currentPage: 359
   }
